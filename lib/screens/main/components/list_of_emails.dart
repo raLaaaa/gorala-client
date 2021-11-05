@@ -48,12 +48,12 @@ class _ListOfEmailsState extends State<ListOfEmails> {
                     IconButton(
                       icon: Icon(Icons.logout),
                       onPressed: () {
-
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
+              Divider(),
               Expanded(
                 child: ListView.builder(
                   itemCount: emails.length,
