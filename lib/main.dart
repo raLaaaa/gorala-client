@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:gorala/bloc/repositories/authentication_repository.dart';
 import 'package:gorala/screens/main/main_screen.dart';
 
 Future main() async {
@@ -9,14 +10,14 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'gorala',
       theme: ThemeData(),
-      home: MainScreen(),
+      home: RepositoryProvider(
+          create: (context) => AuthenticationRepository(), child: MainScreen()),
     );
   }
 }
