@@ -76,7 +76,70 @@ List demo_data = [
     "isChecked": false,
     "tagColor": Color(0xFF3A6FF7),
     "time": "9:58"
-  }
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
+  {
+    "name": "Elenor Bauch",
+    "image": "assets/images/user_5.png",
+    "subject": "New job opportunities",
+    "isAttachmentAvailable": false,
+    "isChecked": false,
+    "tagColor": Color(0xFF3A6FF7),
+    "time": "9:58"
+  },
 ];
 
 String emailDemoText =

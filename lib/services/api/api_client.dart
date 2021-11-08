@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gorala/bloc/repositories/authentication_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:http_parser/http_parser.dart';
 
 class ApiClient {
-  static final String baseUrl = DotEnv().env['SERVER'];
+  static final String baseUrl = dotenv.env['SERVER'];
   static final Duration timeOutDuration = const Duration(seconds: 50);
   static final Client httpClient = http.Client();
 
@@ -16,22 +15,13 @@ class ApiClient {
     return Future.sync(() async {
       Response response;
 
-      try {
-        var uri = Uri.parse(baseUrl + url);
-        if (AuthenticationService.authToken.isEmpty) {
-          response = await http.get(uri).timeout(timeOutDuration);
-        } else {
-          response = await http.get(uri, headers: {
-            'Authorization': 'Token ' + AuthenticationService.authToken,
-
-          }).timeout(timeOutDuration);
-        }
-      } on TimeoutException catch (e) {
-
-        return null;
-      } on SocketException catch (e) {
-
-        return null;
+      var uri = Uri.parse(baseUrl + url);
+      if (AuthRepository.AUTH_TOKEN.isEmpty) {
+        response = await http.get(uri).timeout(timeOutDuration);
+      } else {
+        response = await http.get(uri, headers: {
+          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+        }).timeout(timeOutDuration);
       }
 
       if (response != null) {
@@ -48,21 +38,14 @@ class ApiClient {
     return Future.sync(() async {
       Response response;
 
-      try {
-        var uri = Uri.parse(baseUrl + url);
-        if (AuthenticationService.authToken.isEmpty) {
-          response = await http.post(uri, body: data).timeout(timeOutDuration);
-        } else {
-          response = await http.post(uri, body: data, headers: {
-            'Authorization': 'Token ' + AuthenticationService.authToken,
-          }).timeout(timeOutDuration);
-        }
-      } on TimeoutException catch (e) {
+      var uri = Uri.parse(baseUrl + url);
 
-        return null;
-      } on SocketException catch (e) {
-
-        return null;
+      if (AuthRepository.AUTH_TOKEN.isEmpty) {
+        response = await http.post(uri, body: data).timeout(timeOutDuration);
+      } else {
+        response = await http.post(uri, body: data, headers: {
+          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+        }).timeout(timeOutDuration);
       }
 
       if (response != null) {
@@ -79,15 +62,10 @@ class ApiClient {
     return Future.sync(() async {
       Response response;
 
-      try {
-        var uri = Uri.parse(baseUrl + url);
-        response = await http.put(uri, body: data, headers: {
-          'Authorization': 'Token ' + AuthenticationService.authToken,
-        }).timeout(timeOutDuration);
-      } on TimeoutException catch (e) {
-
-        return null;
-      }
+      var uri = Uri.parse(baseUrl + url);
+      response = await http.put(uri, body: data, headers: {
+        'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+      }).timeout(timeOutDuration);
 
       if (response != null) {
         checkResponseCode(response.statusCode, response.body, url, 'PUT');
@@ -105,16 +83,11 @@ class ApiClient {
       try {
         var uri = Uri.parse(baseUrl + url);
         response = await http.delete(uri, headers: {
-          'Authorization': 'Token ' + AuthenticationService.authToken,
-
+          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);
       } on TimeoutException catch (e) {
-
-
         return null;
       } on SocketException catch (e) {
-
-
         return null;
       }
 
@@ -140,7 +113,7 @@ class ApiClient {
             url +
             ' | TYPE: ' +
             type);
-
+      }
     }
   }
 }
