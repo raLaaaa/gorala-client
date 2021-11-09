@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gorala/responsive.dart';
-import 'components/list_of_emails.dart';
+import 'components/list_of_tasks.dart';
 
 class MainScreen extends StatelessWidget {
   @override
@@ -9,19 +9,19 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       body: Responsive(
         // Let's work on our mobile part
-        mobile: ListOfEmails(),
+        mobile: ListOfTasks(),
         tablet: Row(
           children: [
             Expanded(
               flex: 6,
-              child: ListOfEmails(),
+              child: ListOfTasks(),
             ),
           ],
         ),
         desktop: Row(
           children: [
             Expanded(
-              child: ListOfEmails(),
+              child: ListOfTasks(),
             ),
           ],
         ),

@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
+  final String errorMessage;
+
+  const LoginView({
+    Key key,
+    this.errorMessage,
+  }) : super(key: key);
+
+  @override
+  _LoginViewState createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final String _errorMessage;
   String _username = '';
   String _password = '';
-
-  LoginView([this._errorMessage]);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +26,17 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Widget _loginForm(BuildContext context)  {
+  @override
+  void initState() {
+    super.initState();
+    final authCubit = BlocProvider.of<AuthCubit>(context);
+
+    if (authCubit.state is Foreign) {
+      authCubit.checkIfAuthenticated();
+    }
+  }
+
+  Widget _loginForm(BuildContext context) {
     return Form(
       key: _formKey,
       child: Padding(
@@ -34,7 +53,7 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Widget _usernameField(BuildContext context)  {
+  Widget _usernameField(BuildContext context) {
     return TextFormField(
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -50,7 +69,7 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Widget _passwordField(BuildContext context)  {
+  Widget _passwordField(BuildContext context) {
     return TextFormField(
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -67,14 +86,21 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Widget _loginButton(BuildContext context)  {
+  Widget _loginButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          _errorMessage != null ? Text(_errorMessage, style: TextStyle(color: Colors.red),) : SizedBox(),
+          widget.errorMessage != null
+              ? Text(
+                  widget.errorMessage,
+                  style: TextStyle(color: Colors.red),
+                )
+              : SizedBox(),
           ElevatedButton(
-            onPressed:() {submitLogin(context);},
+            onPressed: () {
+              submitLogin(context);
+            },
             child: Text('Login'),
           ),
         ],

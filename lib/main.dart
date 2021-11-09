@@ -7,6 +7,8 @@ import 'package:gorala/screens/login/login_view.dart';
 import 'package:gorala/screens/main/main_screen.dart';
 
 import 'bloc/cubits/auth_cubit.dart';
+import 'bloc/cubits/task_cubit.dart';
+import 'bloc/repositories/task_repository.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
@@ -20,8 +22,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'gorala',
       theme: ThemeData(),
-      home: BlocProvider(
-        create: (context) => AuthCubit(AuthRepository()),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AuthCubit(AuthRepository())),
+          BlocProvider(create: (context) => TaskCubit(TaskRepository()))
+        ],
         child: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is Foreign) {
@@ -29,12 +34,11 @@ class MyApp extends StatelessWidget {
             } else if (state is AuthLoading) {
               return LoadingView();
             } else if (state is AuthError) {
-              return LoginView(state.message);
+              return LoginView(errorMessage: state.message);
             } else if (state is Authenticated) {
               return MainScreen();
-            }
-            else {
-              return LoginView("Weird things are happening..");
+            } else {
+              return LoginView(errorMessage: "Weird things are happening..");
             }
           },
         ),

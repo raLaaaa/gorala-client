@@ -20,7 +20,7 @@ class ApiClient {
         response = await http.get(uri).timeout(timeOutDuration);
       } else {
         response = await http.get(uri, headers: {
-          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+          'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);
       }
 
@@ -44,7 +44,7 @@ class ApiClient {
         response = await http.post(uri, body: data).timeout(timeOutDuration);
       } else {
         response = await http.post(uri, body: data, headers: {
-          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+          'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);
       }
 
@@ -64,7 +64,7 @@ class ApiClient {
 
       var uri = Uri.parse(baseUrl + url);
       response = await http.put(uri, body: data, headers: {
-        'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+        'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
       }).timeout(timeOutDuration);
 
       if (response != null) {
@@ -83,7 +83,7 @@ class ApiClient {
       try {
         var uri = Uri.parse(baseUrl + url);
         response = await http.delete(uri, headers: {
-          'Authorization': 'Token ' + AuthRepository.AUTH_TOKEN,
+          'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);
       } on TimeoutException catch (e) {
         return null;

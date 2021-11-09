@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:gorala/models/Email.dart';
-import 'package:websafe_svg/websafe_svg.dart';
+import 'package:gorala/models/task.dart';
 
 import '../../../constants.dart';
 import '../../../extensions.dart';
 
-class EmailCard extends StatelessWidget {
-  const EmailCard({
+class TaskCard extends StatelessWidget {
+  const TaskCard({
     Key key,
-    this.isActive = true,
-    this.email,
+    this.task,
     this.press,
   }) : super(key: key);
 
-  final bool isActive;
-  final Email email;
+  final Task task;
   final VoidCallback press;
 
   @override
@@ -39,7 +36,7 @@ class EmailCard extends StatelessWidget {
                       Expanded(
                         child: Text.rich(
                           TextSpan(
-                            text: "${email.name}",
+                            text: "${task.description}",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
