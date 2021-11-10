@@ -92,9 +92,12 @@ class _LoginViewState extends State<LoginView> {
       child: Column(
         children: [
           widget.errorMessage != null
-              ? Text(
-                  widget.errorMessage,
-                  style: TextStyle(color: Colors.red),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    widget.errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
                 )
               : SizedBox(),
           ElevatedButton(

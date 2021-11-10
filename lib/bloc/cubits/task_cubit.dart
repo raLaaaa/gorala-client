@@ -11,9 +11,9 @@ class TaskCubit extends Cubit<TaskState> {
 
   TaskCubit(this._taskRepository) : super(TasksEmpty());
 
-  Future<void> getTasksOfUser() async {
+  Future<void> getAllTasksOfUser() async {
       emit(TasksLoading());
-      List<Task> tasks = await _taskRepository.fetchTasksOfUser();
+      List<Task> tasks = await _taskRepository.fetchAllTasksOfUser();
 
       if(tasks == null){
         emit(TasksEmpty());
@@ -21,5 +21,17 @@ class TaskCubit extends Cubit<TaskState> {
       }
 
       emit(TasksLoaded(tasks));
+  }
+
+  Future<void> getAllTasksOfUserByDate(DateTime time) async {
+    emit(TasksLoading());
+    List<Task> tasks = await _taskRepository.fetchAllTasksOfUserByDate(time);
+
+    if(tasks == null){
+      emit(TasksEmpty());
+      return;
+    }
+
+    emit(TasksLoaded(tasks));
   }
 }

@@ -12,7 +12,7 @@ class AuthRepository {
 
     dynamic response = await ApiClient.postRequest('/login', data);
 
-    if(response.statusCode == 400){
+    if(response.statusCode != 200){
       return null;
     }
 
