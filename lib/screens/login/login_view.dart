@@ -62,9 +62,11 @@ class _LoginViewState extends State<LoginView> {
         _username = value;
         return null;
       },
+      keyboardType: TextInputType.name,
+      autofillHints: [AutofillHints.username],
       decoration: InputDecoration(
         icon: Icon(Icons.person),
-        hintText: 'Username',
+        labelText: 'Username',
       ),
     );
   }
@@ -79,9 +81,11 @@ class _LoginViewState extends State<LoginView> {
         return null;
       },
       obscureText: true,
+      autofillHints: [AutofillHints.password],
+      keyboardType: TextInputType.visiblePassword,
       decoration: InputDecoration(
         icon: Icon(Icons.security),
-        hintText: 'Password',
+        labelText: 'Password',
       ),
     );
   }

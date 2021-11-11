@@ -1,6 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gorala/bloc/cubits/auth_cubit.dart';
+import 'package:gorala/constants.dart';
+import 'package:intl/intl.dart';
+
+class CreateTaskArguments {
+  final DateTime initalDate;
+
+  CreateTaskArguments(this.initalDate);
+}
 
 class CreateTaskView extends StatefulWidget {
   final String errorMessage;
@@ -16,12 +24,22 @@ class CreateTaskView extends StatefulWidget {
 
 class _CreateTaskViewState extends State<CreateTaskView> {
   final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _password = '';
+  DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+  DateTime _initialDate = DateTime.now();
+  DateTime _selectedDate;
+  String _taskDescription = '';
+
 
   @override
   Widget build(BuildContext context) {
+
+    final args = ModalRoute.of(context).settings.arguments as CreateTaskArguments;
+    _initialDate = args.initalDate;
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Create a new task', style: TextStyle(fontSize: 28)),
+      ),
       body: _CreateTaskForm(context),
     );
   }
@@ -29,11 +47,6 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   void initState() {
     super.initState();
-    final authCubit = BlocProvider.of<AuthCubit>(context);
-
-    if (authCubit.state is Foreign) {
-      authCubit.checkIfAuthenticated();
-    }
   }
 
   Widget _CreateTaskForm(BuildContext context) {
@@ -44,8 +57,9 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _usernameField(context),
-            _passwordField(context),
+            _selectTaskDate(context),
+            Divider(),
+            _buildTaskDescription(context),
             _CreateTaskButton(context),
           ],
         ),
@@ -53,35 +67,43 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     );
   }
 
-  Widget _usernameField(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter some text';
-        }
-        _username = value;
-        return null;
-      },
-      decoration: InputDecoration(
-        icon: Icon(Icons.person),
-        hintText: 'Username',
-      ),
+  Widget _selectTaskDate(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Task date:', style: TextStyle(fontSize: 16)),
+        InkWell(
+            onTap: () {
+              _selectDate(context);
+            },
+            child: Row(children: [
+              _selectedDate != null ? Text(
+                _dateFormat.format(_selectedDate),
+                style: TextStyle(fontSize: 16),
+              ) : Text(
+                _dateFormat.format(_initialDate),
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(width: 3),
+              Icon(Icons.edit, size: 15,)
+            ]))
+      ],
     );
   }
 
-  Widget _passwordField(BuildContext context) {
+  Widget _buildTaskDescription(BuildContext context) {
     return TextFormField(
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
         }
-        _password = value;
+        _taskDescription = value;
         return null;
       },
-      obscureText: true,
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
       decoration: InputDecoration(
-        icon: Icon(Icons.security),
-        hintText: 'Password',
+        labelText: 'Task description',
       ),
     );
   }
@@ -93,28 +115,48 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         children: [
           widget.errorMessage != null
               ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              widget.errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-          )
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    widget.errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
               : SizedBox(),
           ElevatedButton(
             onPressed: () {
               submitCreateTask(context);
             },
-            child: Text('CreateTask'),
+            child: Text('Create Task'),
           ),
         ],
       ),
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: _initialDate,
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(primary: kTitleTextColor),
+              buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            ),
+            child: child,
+          );
+        },
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
+  }
+
   void submitCreateTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
-      final authCubit = BlocProvider.of<AuthCubit>(context);
-      authCubit.performAuth(_username, _password);
+
     }
   }
 }

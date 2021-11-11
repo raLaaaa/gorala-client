@@ -6,6 +6,7 @@ import 'package:gorala/bloc/repositories/task_repository.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/responsive.dart';
 import 'package:gorala/screens/loading/loading_screen.dart';
+import 'package:gorala/screens/tasks/create_task_view.dart';
 import 'package:intl/intl.dart';
 
 import '../../constants.dart';
@@ -55,7 +56,13 @@ class _MainScreenState extends State<MainScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/add',
+                arguments: CreateTaskArguments(_currentSelectedDate),
+              );
+            },
           ),
           IconButton(
             icon: Icon(Icons.logout),
@@ -65,17 +72,18 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () {
-          return _refreshTasks(context);
+      body: PageView.builder(
+        controller: _pageController,
+        onPageChanged: (index) {
+          _handlePageChange(index);
         },
-        child: PageView.builder(
-          controller: _pageController,
-          onPageChanged: (index) {
-            _handlePageChange(index);
-          },
-          itemBuilder: (context, _index) {
-            return BlocBuilder<TaskCubit, TaskState>(
+        itemBuilder: (context, _index) {
+          return RefreshIndicator(
+            color: kTitleTextColor,
+            onRefresh: () {
+              return _refreshTasks(context);
+            },
+            child: BlocBuilder<TaskCubit, TaskState>(
               builder: (context, state) {
                 if (state is TasksLoading) {
                   return LoadingView();
@@ -95,9 +103,9 @@ class _MainScreenState extends State<MainScreen> {
                   return Text('this is a bug: ' + state.toString());
                 }
               },
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -126,27 +134,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildEntryForPageController(List<Task> tasks) {
     if (tasks.isEmpty) {
-      return Center(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('No tasks for today', style: TextStyle(fontSize: 16),),
-          SizedBox(height: 8),
-          Container(
-              decoration: BoxDecoration(
-                color: kTitleTextColor,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(24.0),
-                ),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.add),
-                color: Colors.white,
-                onPressed: () {},
-              )),
-        ],
-      ));
+      return _buildIfTasksEmpty();
     }
 
     return Responsive(
@@ -173,6 +161,35 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildIfTasksEmpty() {
+    return Center(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'No tasks found',
+          style: TextStyle(fontSize: 16),
+        ),
+        SizedBox(height: 8),
+        Container(
+            decoration: BoxDecoration(
+              color: kTitleTextColor,
+              borderRadius: BorderRadius.all(
+                Radius.circular(24.0),
+              ),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.add),
+              color: Colors.white,
+              onPressed: () {
+                Navigator.pushNamed(context, '/add', arguments: CreateTaskArguments(_currentSelectedDate),);
+              },
+            )),
+      ],
+    ));
   }
 
   Future<void> _logout(BuildContext context) async {

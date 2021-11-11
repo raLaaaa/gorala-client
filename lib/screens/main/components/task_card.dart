@@ -49,13 +49,7 @@ class TaskCard extends StatelessWidget {
                   ),
                 ],
               ),
-            ).addNeumorphism(
-              blurRadius: 15,
-              borderRadius: 15,
-              offset: Offset(5, 5),
-              topShadowColor: Colors.white60,
-              bottomShadowColor: Color(0xFF234395).withOpacity(0.15),
-            ),
+            )
           ],
         ),
       ),
