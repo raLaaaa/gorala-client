@@ -44,9 +44,9 @@ class ApiClient {
         response = await http.post(uri, body: data).timeout(timeOutDuration);
       } else {
         response = await http.post(uri, body: data, headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);
-
       }
 
       if (response != null) {

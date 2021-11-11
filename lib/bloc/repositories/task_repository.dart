@@ -31,10 +31,7 @@ class TaskRepository {
     }
   }
 
-  Future<Map<DateTime, List<Task>>> fetchAllTasksOfUserByDateWithRange(
-      DateTime time) async {
-
-
+  Future<Map<DateTime, List<Task>>> fetchAllTasksOfUserByDateWithRange(DateTime time) async {
     var _dateFormat = DateFormat('dd-MM-yyyy');
 
     dynamic response = await ApiClient.getRequest(
@@ -49,37 +46,57 @@ class TaskRepository {
     }
   }
 
+  Future<Task> createTask(Task task) async {
+    dynamic data = {
+      "description": task.description,
+      "executionDate": task.executionDate.toUtc().toIso8601String(),
+    };
 
-    Map<DateTime, List<Task>> _convertResponseToMap(decodedBody){
-      Map<DateTime, List<Task>> toReturn = Map();
+    dynamic response = await ApiClient.postRequest(
+        '/api/v1/tasks', jsonEncode(data));
 
-      if(decodedBody.length == 0){
-        return null;
-      }
-
-      decodedBody.forEach((entry) {
-        List<Task> list = toReturn[DateTime.parse(entry['ExecutionDate'])];
-
-        if (list == null) {
-          toReturn[DateTime.parse(entry['ExecutionDate'])] = [];
-          toReturn[DateTime.parse(entry['ExecutionDate'])].add(
-            Task(
-              entry['ID'].toString(),
-              entry['Description'],
-              DateTime.parse(entry['ExecutionDate']),
-            ),
-          );
-        } else {
-          toReturn[DateTime.parse(entry['ExecutionDate'])].add(
-            Task(
-              entry['ID'].toString(),
-              entry['Description'],
-              DateTime.parse(entry['ExecutionDate']),
-            ),
-          );
-        }
-      });
-
-      return toReturn;
+    if (response.statusCode == 200) {
+      var decodedBody = jsonDecode(response.body);
+      return Task(
+        decodedBody['ID'].toString(),
+        decodedBody['Description'],
+        DateTime.parse(decodedBody['ExecutionDate']),
+      );
+    } else {
+    return null;
     }
   }
+
+  Map<DateTime, List<Task>> _convertResponseToMap(decodedBody) {
+    Map<DateTime, List<Task>> toReturn = Map();
+
+    if (decodedBody.length == 0) {
+      return null;
+    }
+
+    decodedBody.forEach((entry) {
+      List<Task> list = toReturn[DateTime.parse(entry['ExecutionDate'])];
+
+      if (list == null) {
+        toReturn[DateTime.parse(entry['ExecutionDate'])] = [];
+        toReturn[DateTime.parse(entry['ExecutionDate'])].add(
+          Task(
+            entry['ID'].toString(),
+            entry['Description'],
+            DateTime.parse(entry['ExecutionDate']),
+          ),
+        );
+      } else {
+        toReturn[DateTime.parse(entry['ExecutionDate'])].add(
+          Task(
+            entry['ID'].toString(),
+            entry['Description'],
+            DateTime.parse(entry['ExecutionDate']),
+          ),
+        );
+      }
+    });
+
+    return toReturn;
+  }
+}

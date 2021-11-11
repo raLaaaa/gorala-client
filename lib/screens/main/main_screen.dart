@@ -12,6 +12,12 @@ import 'package:intl/intl.dart';
 import '../../constants.dart';
 import 'components/list_of_tasks.dart';
 
+class MainScreenArguments {
+  final DateTime initalDate;
+
+  MainScreenArguments(this.initalDate);
+}
+
 class MainScreen extends StatefulWidget {
   const MainScreen({
     Key key,
@@ -26,6 +32,7 @@ class _MainScreenState extends State<MainScreen> {
   int _lazyLoadingThreshold = 0;
   int _lazyLoadingThresholdReachedRight = 1;
   int _lazyLoadingThresholdReachedLeft = 1;
+  bool _hasBeenNavigatedByArgs;
   PageController _pageController;
   DateFormat _dateFormat;
   DateTime _currentSelectedDate;
@@ -37,6 +44,7 @@ class _MainScreenState extends State<MainScreen> {
     _pageController = PageController(initialPage: _initialPage);
     _dateFormat = DateFormat('dd.MM.yyyy');
     _currentSelectedDate = DateTime.now();
+    _hasBeenNavigatedByArgs = false;
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
@@ -50,6 +58,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _checkIfAutoNavigate(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
@@ -94,6 +104,7 @@ class _MainScreenState extends State<MainScreen> {
                   dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
                   DateTime roundedDate = DateTime(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0).toUtc();
                   var tasksForThisDay = state.tasks[roundedDate];
+
                   if (tasksForThisDay != null) {
                     return _buildEntryForPageController(tasksForThisDay);
                   } else {
@@ -110,7 +121,28 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void _checkIfAutoNavigate(context) {
+    var args = ModalRoute.of(context).settings.arguments as MainScreenArguments;
+    if (args != null && args.initalDate != null && !_hasBeenNavigatedByArgs) {
+
+      DateTime nowFull = DateTime.now().toUtc();
+      DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0,0);
+      DateTime clearedTime = DateTime(args.initalDate.year, args.initalDate.month, args.initalDate.day);
+
+      int diff = clearedTime.difference(now).inDays;
+
+      setState(() {
+        _initialPage =  _initialPage + diff;
+        _handlePageChange(_initialPage );
+      });
+
+      _hasBeenNavigatedByArgs = true;
+    }
+  }
+
   _handlePageChange(int index) async {
+    print('NEW ' + index.toString());
+
     DateTime now = DateTime.now();
     DateTime newDate = now.add(Duration(days: index - _initialPage));
     int fetchRange = (int.parse(TaskRepository.LAZY_LOADING_FETCH_RANGE));
@@ -185,7 +217,11 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.add),
               color: Colors.white,
               onPressed: () {
-                Navigator.pushNamed(context, '/add', arguments: CreateTaskArguments(_currentSelectedDate),);
+                Navigator.pushNamed(
+                  context,
+                  '/add',
+                  arguments: CreateTaskArguments(_currentSelectedDate),
+                );
               },
             )),
       ],

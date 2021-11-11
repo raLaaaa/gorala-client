@@ -51,4 +51,18 @@ class TaskCubit extends Cubit<TaskState> {
     _cachedEntries.addAll(tasks);
     emit(TasksLoaded(_cachedEntries));
   }
+
+  Future<void> createTask(Task task) async {
+    emit(TasksLoading());
+    Task createdTask = await _taskRepository.createTask(task);
+
+    if(createdTask != null){
+        _cachedEntries[createdTask.executionDate].add(createdTask);
+    }
+    else{
+      emit(TasksError('Something broke'));
+    }
+
+    emit(TasksLoaded(_cachedEntries));
+  }
 }

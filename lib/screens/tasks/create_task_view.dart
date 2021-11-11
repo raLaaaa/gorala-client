@@ -1,7 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gorala/bloc/cubits/task_cubit.dart';
 import 'package:gorala/constants.dart';
+import 'package:gorala/models/task.dart';
+import 'package:gorala/screens/main/main_screen.dart';
 import 'package:intl/intl.dart';
 
 class CreateTaskArguments {
@@ -29,10 +33,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   DateTime _selectedDate;
   String _taskDescription = '';
 
-
   @override
   Widget build(BuildContext context) {
-
     final args = ModalRoute.of(context).settings.arguments as CreateTaskArguments;
     _initialDate = args.initalDate;
 
@@ -77,15 +79,20 @@ class _CreateTaskViewState extends State<CreateTaskView> {
               _selectDate(context);
             },
             child: Row(children: [
-              _selectedDate != null ? Text(
-                _dateFormat.format(_selectedDate),
-                style: TextStyle(fontSize: 16),
-              ) : Text(
-                _dateFormat.format(_initialDate),
-                style: TextStyle(fontSize: 16),
-              ),
+              _selectedDate != null
+                  ? Text(
+                      _dateFormat.format(_selectedDate),
+                      style: TextStyle(fontSize: 16),
+                    )
+                  : Text(
+                      _dateFormat.format(_initialDate),
+                      style: TextStyle(fontSize: 16),
+                    ),
               SizedBox(width: 3),
-              Icon(Icons.edit, size: 15,)
+              Icon(
+                Icons.edit,
+                size: 15,
+              )
             ]))
       ],
     );
@@ -156,7 +163,17 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   void submitCreateTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
+      DateTime date = _selectedDate ?? _initialDate;
 
+      Task toCreate = Task("", _taskDescription, date);
+
+      final taskCubit = BlocProvider.of<TaskCubit>(context);
+      taskCubit.createTask(toCreate);
+      Navigator.pushNamed(
+        context,
+        '/',
+        arguments: MainScreenArguments(toCreate.executionDate),
+      );
     }
   }
 }

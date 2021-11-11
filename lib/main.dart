@@ -19,46 +19,45 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: kTitleTextColor,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: TextButton.styleFrom(
-              backgroundColor: kTitleTextColor
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (context) => AuthCubit(AuthRepository())), BlocProvider(create: (context) => TaskCubit(TaskRepository()))],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: kTitleTextColor,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
           ),
         ),
+        title: 'gorala',
+        initialRoute: '/',
+        routes: {
+          '/': (context) => _buildEntryScreen(),
+          '/add': (context) => const CreateTaskView(),
+          '/edit': (context) => const EditTaskView(),
+        },
       ),
-      title: 'gorala',
-      initialRoute: '/',
-      routes: {
-        '/': (context) => _buildEntryScreen(),
-        '/add': (context) => const CreateTaskView(),
-        '/edit': (context) => const EditTaskView(),
-      },
     );
   }
 
   Widget _buildEntryScreen() {
-    return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => AuthCubit(AuthRepository())), BlocProvider(create: (context) => TaskCubit(TaskRepository()))],
-      child: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          if (state is Foreign) {
-            return LoginView();
-          } else if (state is AuthLoading) {
-            return LoadingView();
-          } else if (state is AuthError) {
-            return LoginView(errorMessage: state.message);
-          } else if (state is Authenticated) {
-            return MainScreen();
-          } else {
-            return LoginView(errorMessage: "Weird things are happening..");
-          }
-        },
-      ),
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        if (state is Foreign) {
+          return LoginView();
+        } else if (state is AuthLoading) {
+          return LoadingView();
+        } else if (state is AuthError) {
+          return LoginView(errorMessage: state.message);
+        } else if (state is Authenticated) {
+          return MainScreen();
+        } else {
+          return LoginView(errorMessage: "Weird things are happening..");
+        }
+      },
     );
   }
 }
