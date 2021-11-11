@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gorala/bloc/repositories/authentication_repository.dart';
+import 'package:gorala/constants.dart';
 import 'package:gorala/screens/loading/loading_screen.dart';
 import 'package:gorala/screens/login/login_view.dart';
 import 'package:gorala/screens/main/main_screen.dart';
@@ -21,7 +22,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'gorala',
-      theme: ThemeData(),
+      theme: ThemeData(
+        primaryColor: kTitleTextColor
+      ),
       home: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AuthCubit(AuthRepository())),

@@ -8,6 +8,7 @@ import 'package:gorala/responsive.dart';
 import 'package:gorala/screens/loading/loading_screen.dart';
 import 'package:intl/intl.dart';
 
+import '../../constants.dart';
 import 'components/list_of_tasks.dart';
 
 class MainScreen extends StatefulWidget {
@@ -85,7 +86,6 @@ class _MainScreenState extends State<MainScreen> {
                   dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
                   DateTime roundedDate = DateTime(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0).toUtc();
                   var tasksForThisDay = state.tasks[roundedDate];
-
                   if (tasksForThisDay != null) {
                     return _buildEntryForPageController(tasksForThisDay);
                   } else {
@@ -106,7 +106,6 @@ class _MainScreenState extends State<MainScreen> {
     DateTime now = DateTime.now();
     DateTime newDate = now.add(Duration(days: index - _initialPage));
     int fetchRange = (int.parse(TaskRepository.LAZY_LOADING_FETCH_RANGE));
-    int absTimesSwiped = ((index - _initialPage).abs());
 
     setState(() {
       _currentSelectedDate = newDate;
@@ -127,7 +126,27 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildEntryForPageController(List<Task> tasks) {
     if (tasks.isEmpty) {
-      return Center(child: Text("No tasks yet"));
+      return Center(
+          child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('No tasks for today', style: TextStyle(fontSize: 16),),
+          SizedBox(height: 8),
+          Container(
+              decoration: BoxDecoration(
+                color: kTitleTextColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(24.0),
+                ),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.add),
+                color: Colors.white,
+                onPressed: () {},
+              )),
+        ],
+      ));
     }
 
     return Responsive(
