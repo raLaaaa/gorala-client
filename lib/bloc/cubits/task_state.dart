@@ -13,7 +13,7 @@ class TasksLoading extends TaskState {
 }
 
 class TasksLoaded extends TaskState {
-  final List<Task> tasks;
+  final Map<DateTime, List<Task>> tasks;
   const TasksLoaded(this.tasks);
 
   @override

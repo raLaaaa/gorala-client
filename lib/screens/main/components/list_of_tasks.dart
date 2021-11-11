@@ -43,7 +43,6 @@ class _ListOfTasksState extends State<ListOfTasks> {
         right: false,
         child: ListView.builder(
           itemCount: widget.taskList.length,
-          // On mobile this active dosen't mean anything
           itemBuilder: (context, index) => TaskCard(
             task: widget.taskList[index],
             press: () {},
