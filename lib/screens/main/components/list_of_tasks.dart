@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:gorala/models/task.dart';
+import 'package:gorala/screens/tasks/edit_task_view.dart';
 
 import '../../../constants.dart';
 import 'task_card.dart';
@@ -45,7 +46,13 @@ class _ListOfTasksState extends State<ListOfTasks> {
           itemCount: widget.taskList.length,
           itemBuilder: (context, index) => TaskCard(
             task: widget.taskList[index],
-            press: () {},
+            press: () {
+              Navigator.pushNamed(
+                context,
+                '/edit',
+                arguments: EditTaskArguments(widget.taskList[index]),
+              );
+            },
           ),
         ),
       ),

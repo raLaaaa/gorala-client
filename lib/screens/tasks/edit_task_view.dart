@@ -1,13 +1,25 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gorala/bloc/cubits/auth_cubit.dart';
+import 'package:gorala/bloc/cubits/task_cubit.dart';
+import 'package:gorala/constants.dart';
+import 'package:gorala/models/task.dart';
+import 'package:gorala/screens/main/main_screen.dart';
+import 'package:intl/intl.dart';
+
+class EditTaskArguments {
+  final Task task;
+
+  EditTaskArguments(this.task);
+}
 
 class EditTaskView extends StatefulWidget {
-  final String errorMessage;
+  final Task task;
 
   const EditTaskView({
     Key key,
-    this.errorMessage,
+    this.task,
   }) : super(key: key);
 
   @override
@@ -16,12 +28,39 @@ class EditTaskView extends StatefulWidget {
 
 class _EditTaskViewState extends State<EditTaskView> {
   final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _password = '';
+  DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+  DateTime _initialDate = DateTime.now();
+  DateTime _selectedDate;
+  String _taskDescription;
+  String _errorMessage;
+  Task _taskToEdit;
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context).settings.arguments as EditTaskArguments;
+    _taskToEdit = args.task;
+    _initialDate = _taskToEdit.executionDate;
+    _taskDescription = _taskToEdit.description;
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit your task', style: TextStyle(fontSize: 28)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              final taskCubit = BlocProvider.of<TaskCubit>(context);
+              taskCubit.deleteTask(_taskToEdit);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/',
+                (Route<dynamic> route) => false,
+                arguments: MainScreenArguments(_taskToEdit.executionDate),
+              );
+            },
+          ),
+        ],
+      ),
       body: _EditTaskForm(context),
     );
   }
@@ -29,11 +68,6 @@ class _EditTaskViewState extends State<EditTaskView> {
   @override
   void initState() {
     super.initState();
-    final authCubit = BlocProvider.of<AuthCubit>(context);
-
-    if (authCubit.state is Foreign) {
-      authCubit.checkIfAuthenticated();
-    }
   }
 
   Widget _EditTaskForm(BuildContext context) {
@@ -44,77 +78,122 @@ class _EditTaskViewState extends State<EditTaskView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _usernameField(context),
-            _passwordField(context),
-            _EditTaskButton(context),
+            _selectTaskDate(context),
+            Divider(),
+            _buildTaskDescription(context),
+            _editTaskButton(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _usernameField(BuildContext context) {
+  Widget _selectTaskDate(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Task date:', style: TextStyle(fontSize: 16)),
+        InkWell(
+            onTap: () {
+              _selectDate(context);
+            },
+            child: Row(children: [
+              _selectedDate != null
+                  ? Text(
+                      _dateFormat.format(_selectedDate),
+                      style: TextStyle(fontSize: 16),
+                    )
+                  : Text(
+                      _dateFormat.format(_initialDate),
+                      style: TextStyle(fontSize: 16),
+                    ),
+              SizedBox(width: 3),
+              Icon(
+                Icons.edit,
+                size: 15,
+              )
+            ]))
+      ],
+    );
+  }
+
+  Widget _buildTaskDescription(BuildContext context) {
     return TextFormField(
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
         }
-        _username = value;
+        _taskDescription = value;
         return null;
       },
+      initialValue: _taskDescription,
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
       decoration: InputDecoration(
-        icon: Icon(Icons.person),
-        hintText: 'Username',
+        labelText: 'Task description',
       ),
     );
   }
 
-  Widget _passwordField(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter some text';
-        }
-        _password = value;
-        return null;
-      },
-      obscureText: true,
-      decoration: InputDecoration(
-        icon: Icon(Icons.security),
-        hintText: 'Password',
-      ),
-    );
-  }
-
-  Widget _EditTaskButton(BuildContext context) {
+  Widget _editTaskButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          widget.errorMessage != null
+          _errorMessage != null
               ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              widget.errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-          )
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
               : SizedBox(),
           ElevatedButton(
             onPressed: () {
               submitEditTask(context);
             },
-            child: Text('EditTask'),
+            child: Text('Edit Task'),
           ),
         ],
       ),
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: _initialDate,
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(primary: kTitleTextColor),
+              buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            ),
+            child: child,
+          );
+        },
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
+  }
+
   void submitEditTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
-      final authCubit = BlocProvider.of<AuthCubit>(context);
-      authCubit.performAuth(_username, _password);
+      DateTime date = _selectedDate ?? _initialDate;
+      Task editedTask = Task(_taskToEdit.id, _taskDescription, date);
+
+      final taskCubit = BlocProvider.of<TaskCubit>(context);
+      taskCubit.editTask(editedTask);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/',
+            (Route<dynamic> route) => false,
+        arguments: MainScreenArguments(editedTask.executionDate),
+      );
     }
   }
 }

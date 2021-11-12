@@ -89,6 +89,7 @@ class ApiClient {
 
       var uri = Uri.parse(baseUrl + url);
       response = await http.put(uri, body: data, headers: {
+        'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
       }).timeout(timeOutDuration);
 

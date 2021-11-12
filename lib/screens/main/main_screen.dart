@@ -244,7 +244,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Text(
             'No tasks found',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 17),
           ),
         ],
       ),
@@ -290,6 +290,6 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _refreshTasks(BuildContext context) async {
     final taskCubit = BlocProvider.of<TaskCubit>(context);
-    taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+    taskCubit.getAllTasksOfUserByDate(_currentSelectedDate);
   }
 }

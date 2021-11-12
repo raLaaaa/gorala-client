@@ -20,7 +20,7 @@ class TaskRepository {
   }
 
   Future<Map<DateTime, List<Task>>> fetchAllTasksOfUserByDate(DateTime time) async {
-    DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+    DateFormat _dateFormat = DateFormat('dd-MM-yyyy');
     dynamic response = await ApiClient.getRequest('/api/v1/tasks/' + _dateFormat.format(time));
 
     if (response.statusCode == 200) {
@@ -53,7 +53,7 @@ class TaskRepository {
     };
 
     dynamic response = await ApiClient.postRequestAsJSON(
-        '/api/v1/tasks', jsonEncode(data));
+        '/api/v1/tasks/add', jsonEncode(data));
 
     if(response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
@@ -66,6 +66,41 @@ class TaskRepository {
       return task;
     } else {
     return null;
+    }
+  }
+
+  Future<Task> editTask(Task task) async {
+    dynamic data = {
+      "description": task.description,
+      "executionDate": task.executionDate.toUtc().toIso8601String(),
+    };
+
+     dynamic response = await ApiClient.putRequest(
+        '/api/v1/tasks/edit/'+task.id, jsonEncode(data));
+
+    if(response.statusCode == 201) {
+      var decodedBody = jsonDecode(response.body);
+      Task task =Task(
+        decodedBody['ID'].toString(),
+        decodedBody['Description'],
+        DateTime.parse(decodedBody['ExecutionDate']),
+      );
+
+      return task;
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> deleteTask(Task task) async {
+
+    dynamic response = await ApiClient.deleteRequest(
+        '/api/v1/tasks/delete/'+task.id);
+
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 

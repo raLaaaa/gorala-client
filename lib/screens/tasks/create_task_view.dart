@@ -9,9 +9,9 @@ import 'package:gorala/screens/main/main_screen.dart';
 import 'package:intl/intl.dart';
 
 class CreateTaskArguments {
-  final DateTime initalDate;
+  final DateTime initialDate;
 
-  CreateTaskArguments(this.initalDate);
+  CreateTaskArguments(this.initialDate);
 }
 
 class CreateTaskView extends StatefulWidget {
@@ -36,7 +36,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments as CreateTaskArguments;
-    _initialDate = args.initalDate;
+    _initialDate = args.initialDate;
 
     return Scaffold(
       appBar: AppBar(
@@ -169,9 +169,10 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.createTask(toCreate);
-      Navigator.pushNamed(
+      Navigator.pushNamedAndRemoveUntil(
         context,
         '/',
+        (Route<dynamic> route) => false,
         arguments: MainScreenArguments(toCreate.executionDate),
       );
     }
