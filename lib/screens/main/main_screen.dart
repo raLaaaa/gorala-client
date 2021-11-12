@@ -28,11 +28,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _initialPage = 4775807;
+  final int _initialPage = 4775807;
   int _lazyLoadingThreshold = 0;
   int _lazyLoadingThresholdReachedRight = 1;
   int _lazyLoadingThresholdReachedLeft = 1;
+  int _indexDiffToDate = 0;
   bool _hasBeenNavigatedByArgs;
+  bool _usePostFrameCallBack = false;
   PageController _pageController;
   DateFormat _dateFormat;
   DateTime _currentSelectedDate;
@@ -48,6 +50,13 @@ class _MainScreenState extends State<MainScreen> {
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfAutoNavigate(context);
+      if (_usePostFrameCallBack && _indexDiffToDate != 0) {
+        _pageController.jumpToPage(_initialPage + _indexDiffToDate);
+      }
+    });
   }
 
   @override
@@ -58,8 +67,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _checkIfAutoNavigate(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
@@ -87,6 +94,7 @@ class _MainScreenState extends State<MainScreen> {
         onPageChanged: (index) {
           _handlePageChange(index);
         },
+        physics: BouncingScrollPhysics(),
         itemBuilder: (context, _index) {
           return RefreshIndicator(
             color: kTitleTextColor,
@@ -124,25 +132,18 @@ class _MainScreenState extends State<MainScreen> {
   void _checkIfAutoNavigate(context) {
     var args = ModalRoute.of(context).settings.arguments as MainScreenArguments;
     if (args != null && args.initalDate != null && !_hasBeenNavigatedByArgs) {
-
       DateTime nowFull = DateTime.now().toUtc();
-      DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0,0);
+      DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
       DateTime clearedTime = DateTime(args.initalDate.year, args.initalDate.month, args.initalDate.day);
 
-      int diff = clearedTime.difference(now).inDays;
+      _indexDiffToDate = clearedTime.difference(now).inDays;
 
-      setState(() {
-        _initialPage =  _initialPage + diff;
-        _handlePageChange(_initialPage );
-      });
-
+      _usePostFrameCallBack = true;
       _hasBeenNavigatedByArgs = true;
     }
   }
 
   _handlePageChange(int index) async {
-    print('NEW ' + index.toString());
-
     DateTime now = DateTime.now();
     DateTime newDate = now.add(Duration(days: index - _initialPage));
     int fetchRange = (int.parse(TaskRepository.LAZY_LOADING_FETCH_RANGE));
@@ -166,7 +167,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildEntryForPageController(List<Task> tasks) {
     if (tasks.isEmpty) {
-      return _buildIfTasksEmpty();
+      return Container(color: kBgDarkColor, child: _buildIfTasksEmpty());
     }
 
     return Responsive(
@@ -197,34 +198,36 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildIfTasksEmpty() {
     return Center(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'No tasks found',
-          style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(height: 8),
-        Container(
-            decoration: BoxDecoration(
-              color: kTitleTextColor,
-              borderRadius: BorderRadius.all(
-                Radius.circular(24.0),
+        child: Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'No tasks found',
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 8),
+          Container(
+              decoration: BoxDecoration(
+                color: kTitleTextColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(24.0),
+                ),
               ),
-            ),
-            child: IconButton(
-              icon: Icon(Icons.add),
-              color: Colors.white,
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  '/add',
-                  arguments: CreateTaskArguments(_currentSelectedDate),
-                );
-              },
-            )),
-      ],
+              child: IconButton(
+                icon: Icon(Icons.add),
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/add',
+                    arguments: CreateTaskArguments(_currentSelectedDate),
+                  );
+                },
+              )),
+        ],
+      ),
     ));
   }
 

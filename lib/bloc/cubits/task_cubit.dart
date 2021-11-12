@@ -57,10 +57,14 @@ class TaskCubit extends Cubit<TaskState> {
     Task createdTask = await _taskRepository.createTask(task);
 
     if(createdTask != null){
+        if(_cachedEntries[createdTask.executionDate] == null){
+          _cachedEntries[createdTask.executionDate] = [];
+        }
         _cachedEntries[createdTask.executionDate].add(createdTask);
     }
     else{
       emit(TasksError('Something broke'));
+      return;
     }
 
     emit(TasksLoaded(_cachedEntries));

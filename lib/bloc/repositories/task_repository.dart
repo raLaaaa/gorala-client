@@ -55,13 +55,15 @@ class TaskRepository {
     dynamic response = await ApiClient.postRequest(
         '/api/v1/tasks', jsonEncode(data));
 
-    if (response.statusCode == 200) {
+    if(response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
-      return Task(
+      Task task =Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
         DateTime.parse(decodedBody['ExecutionDate']),
       );
+
+      return task;
     } else {
     return null;
     }
