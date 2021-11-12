@@ -29,12 +29,15 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final int _initialPage = 4775807;
-  int _lazyLoadingThreshold = 0;
-  int _lazyLoadingThresholdReachedRight = 1;
-  int _lazyLoadingThresholdReachedLeft = 1;
+  int _currentIndex;
+
+  Set<int> _loadedRanges;
+  int _stepsWentLeft = 0;
+  int _stepsWentRight = 0;
+
   int _indexDiffToDate = 0;
   bool _hasBeenNavigatedByArgs;
-  bool _usePostFrameCallBack = false;
+  bool _usePostFrameCallBackByArgNav = false;
   PageController _pageController;
   DateFormat _dateFormat;
   DateTime _currentSelectedDate;
@@ -43,6 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
+    _loadedRanges = Set();
     _pageController = PageController(initialPage: _initialPage);
     _dateFormat = DateFormat('dd.MM.yyyy');
     _currentSelectedDate = DateTime.now();
@@ -50,13 +54,10 @@ class _MainScreenState extends State<MainScreen> {
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+    _loadedRanges.add(_initialPage);
+    _currentIndex = _initialPage;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkIfAutoNavigate(context);
-      if (_usePostFrameCallBack && _indexDiffToDate != 0) {
-        _pageController.jumpToPage(_initialPage + _indexDiffToDate);
-      }
-    });
+    _setupPostFrameCallBack(taskCubit);
   }
 
   @override
@@ -104,7 +105,7 @@ class _MainScreenState extends State<MainScreen> {
             child: BlocBuilder<TaskCubit, TaskState>(
               builder: (context, state) {
                 if (state is TasksLoading) {
-                  return LoadingView();
+                  return Center(child: CircularProgressIndicator());
                 } else if (state is TasksError) {
                   return Center(child: Text(state.message));
                 } else if (state is TasksLoaded) {
@@ -129,6 +130,18 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void _setupPostFrameCallBack(TaskCubit taskCubit) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfAutoNavigate(context);
+      if (_usePostFrameCallBackByArgNav && _indexDiffToDate != 0) {
+        int newIndex = _initialPage + _indexDiffToDate;
+        _pageController.jumpToPage(newIndex);
+        taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+        _loadedRanges.add(newIndex);
+      }
+    });
+  }
+
   void _checkIfAutoNavigate(context) {
     var args = ModalRoute.of(context).settings.arguments as MainScreenArguments;
     if (args != null && args.initalDate != null && !_hasBeenNavigatedByArgs) {
@@ -138,7 +151,7 @@ class _MainScreenState extends State<MainScreen> {
 
       _indexDiffToDate = clearedTime.difference(now).inDays;
 
-      _usePostFrameCallBack = true;
+      _usePostFrameCallBackByArgNav = true;
       _hasBeenNavigatedByArgs = true;
     }
   }
@@ -147,22 +160,39 @@ class _MainScreenState extends State<MainScreen> {
     DateTime now = DateTime.now();
     DateTime newDate = now.add(Duration(days: index - _initialPage));
     int fetchRange = (int.parse(TaskRepository.LAZY_LOADING_FETCH_RANGE));
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
 
     setState(() {
       _currentSelectedDate = newDate;
     });
 
-    _lazyLoadingThreshold = ((index - _initialPage));
+    if (index > _currentIndex) {
+      _stepsWentRight += 1;
+      _stepsWentLeft -= 1;
 
-    if (_lazyLoadingThreshold >= (fetchRange * _lazyLoadingThresholdReachedRight)) {
-      _lazyLoadingThresholdReachedRight += 1;
-      final taskCubit = BlocProvider.of<TaskCubit>(context);
-      taskCubit.getAllTasksOfUserByDateWithRange(newDate);
-    } else if (_lazyLoadingThreshold <= ((fetchRange * -1) * _lazyLoadingThresholdReachedLeft)) {
-      _lazyLoadingThresholdReachedLeft += 1;
-      final taskCubit = BlocProvider.of<TaskCubit>(context);
-      taskCubit.getAllTasksOfUserByDateWithRange(newDate);
+      if (_stepsWentRight >= fetchRange) {
+        _stepsWentRight = 0;
+
+        if (!_loadedRanges.contains(index)) {
+          _loadedRanges.add(index);
+          taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+        }
+      }
+    } else if (index < _currentIndex) {
+      _stepsWentLeft += 1;
+      _stepsWentRight -= 1;
+
+      if (_stepsWentLeft >= fetchRange) {
+        _stepsWentLeft = 0;
+
+        if (!_loadedRanges.contains(index)) {
+          _loadedRanges.add(index);
+          taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+        }
+      }
     }
+
+    _currentIndex = index;
   }
 
   Widget _buildEntryForPageController(List<Task> tasks) {
