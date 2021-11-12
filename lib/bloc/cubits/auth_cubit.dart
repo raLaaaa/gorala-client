@@ -44,13 +44,13 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await _authRepository.login(username, password);
 
       if(user == null){
-        emit(AuthError("Invalid Credentials"));
+        emit(AuthError("Invalid Credentials", username));
         return;
       }
 
       emit(Authenticated(user));
     } on Exception catch(e){
-      emit(AuthError(e.toString()));
+      emit(AuthError(e.toString(), username));
     }
   }
 

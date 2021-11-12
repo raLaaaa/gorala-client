@@ -4,9 +4,11 @@ import 'package:gorala/bloc/cubits/auth_cubit.dart';
 
 class LoginView extends StatefulWidget {
   final String errorMessage;
+  final String userName;
 
   const LoginView({
     Key key,
+    this.userName,
     this.errorMessage,
   }) : super(key: key);
 
@@ -62,6 +64,7 @@ class _LoginViewState extends State<LoginView> {
         _username = value;
         return null;
       },
+      initialValue: widget.userName ?? '',
       keyboardType: TextInputType.name,
       autofillHints: [AutofillHints.username],
       decoration: InputDecoration(

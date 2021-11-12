@@ -5,7 +5,6 @@ import 'package:gorala/bloc/cubits/task_cubit.dart';
 import 'package:gorala/bloc/repositories/task_repository.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/responsive.dart';
-import 'package:gorala/screens/loading/loading_screen.dart';
 import 'package:gorala/screens/tasks/create_task_view.dart';
 import 'package:intl/intl.dart';
 
@@ -69,17 +68,27 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          hoverColor: Colors.black,
+          elevation: 10,
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/add',
+              arguments: CreateTaskArguments(_currentSelectedDate),
+            );
+          },
+          backgroundColor: kTitleTextColor,
+          child: Icon(
+            Icons.add,
+          )),
       appBar: AppBar(
         title: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.calendar_today),
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/add',
-                arguments: CreateTaskArguments(_currentSelectedDate),
-              );
+              _selectDate(context);
             },
           ),
           IconButton(
@@ -237,28 +246,41 @@ class _MainScreenState extends State<MainScreen> {
             'No tasks found',
             style: TextStyle(fontSize: 16),
           ),
-          SizedBox(height: 8),
-          Container(
-              decoration: BoxDecoration(
-                color: kTitleTextColor,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(24.0),
-                ),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.add),
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/add',
-                    arguments: CreateTaskArguments(_currentSelectedDate),
-                  );
-                },
-              )),
         ],
       ),
     ));
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: _currentSelectedDate,
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(primary: kTitleTextColor),
+              buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            ),
+            child: child,
+          );
+        },
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != _currentSelectedDate)
+      setState(() {
+        _currentSelectedDate = picked;
+
+        DateTime nowFull = DateTime.now().toUtc();
+        DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
+        DateTime clearedTime = DateTime(_currentSelectedDate.year, _currentSelectedDate.month, _currentSelectedDate.day);
+
+        _indexDiffToDate = clearedTime.difference(now).inDays;
+        int newIndex = _initialPage + _indexDiffToDate;
+        _pageController.jumpToPage(newIndex);
+        final taskCubit = BlocProvider.of<TaskCubit>(context);
+        taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+        _loadedRanges.add(newIndex);
+      });
   }
 
   Future<void> _logout(BuildContext context) async {

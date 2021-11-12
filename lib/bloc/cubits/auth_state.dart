@@ -29,7 +29,8 @@ class Authenticated extends AuthState {
 
 class AuthError extends AuthState {
   final String message;
-  const AuthError(this.message);
+  final String username;
+  const AuthError(this.message, this.username);
 
   @override
   bool operator ==(Object o) {

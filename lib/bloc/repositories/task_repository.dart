@@ -52,7 +52,7 @@ class TaskRepository {
       "executionDate": task.executionDate.toUtc().toIso8601String(),
     };
 
-    dynamic response = await ApiClient.postRequest(
+    dynamic response = await ApiClient.postRequestAsJSON(
         '/api/v1/tasks', jsonEncode(data));
 
     if(response.statusCode == 201) {

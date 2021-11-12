@@ -19,7 +19,6 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -28,6 +27,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: kTitleTextColor,
+          accentColor: kTitleTextColor,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
           ),
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         } else if (state is AuthLoading) {
           return LoadingView();
         } else if (state is AuthError) {
-          return LoginView(errorMessage: state.message);
+          return LoginView(errorMessage: state.message, userName: state.username);
         } else if (state is Authenticated) {
           return MainScreen();
         } else {

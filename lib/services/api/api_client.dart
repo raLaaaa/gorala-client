@@ -44,6 +44,30 @@ class ApiClient {
         response = await http.post(uri, body: data).timeout(timeOutDuration);
       } else {
         response = await http.post(uri, body: data, headers: {
+          'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
+        }).timeout(timeOutDuration);
+      }
+
+      if (response != null) {
+        checkResponseCode(response.statusCode, response.body, url, 'POST');
+      } else {
+        throw Exception('Response was null for POST ' + url);
+      }
+
+      return response;
+    });
+  }
+
+  static Future<http.Response> postRequestAsJSON(String url, Object data) async {
+    return Future.sync(() async {
+      Response response;
+
+      var uri = Uri.parse(baseUrl + url);
+
+      if (AuthRepository.AUTH_TOKEN.isEmpty) {
+        response = await http.post(uri, body: data).timeout(timeOutDuration);
+      } else {
+        response = await http.post(uri, body: data, headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + AuthRepository.AUTH_TOKEN,
         }).timeout(timeOutDuration);

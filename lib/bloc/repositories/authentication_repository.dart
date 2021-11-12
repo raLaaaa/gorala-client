@@ -11,8 +11,10 @@ class AuthRepository {
     var data = {'username': username, 'password': password};
 
     dynamic response = await ApiClient.postRequest('/login', data);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if(response.statusCode != 200){
+      await prefs.setString('EMAIL', username);
       return null;
     }
 
@@ -21,9 +23,9 @@ class AuthRepository {
     var userToken = jsonDecode(response.body)['token'];
     AUTH_TOKEN = userToken;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     await prefs.setString('AUTH_TOKEN', AUTH_TOKEN);
-    await prefs.setString('EMAIL', userToken);
+    await prefs.setString('EMAIL', userMail);
     await prefs.setString('ID', userID.toString());
 
     return User(userMail, userID.toString(), userToken);
