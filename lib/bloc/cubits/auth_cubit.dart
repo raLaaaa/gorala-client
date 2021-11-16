@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/repositories/authentication_repository.dart';
 import 'package:gorala/models/user.dart';
@@ -31,7 +33,6 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-
     } else {
       emit(Foreign());
     }
@@ -50,6 +51,34 @@ class AuthCubit extends Cubit<AuthState> {
 
       emit(Authenticated(user));
     } on Exception catch(e){
+
+      if(e is TimeoutException){
+        emit(AuthError("Server not reachable", username));
+        return;
+      }
+
+      emit(AuthError(e.toString(), username));
+    }
+  }
+
+  Future<void> register(String username, String password) async {
+    try {
+      emit(AuthLoading());
+      bool success = await _authRepository.register(username, password);
+
+      if(!success){
+        emit(RegistrationError("Registration Error"));
+        return;
+      }
+
+      emit(Foreign());
+    } on Exception catch(e){
+
+      if(e is TimeoutException){
+        emit(AuthError("Server not reachable", username));
+        return;
+      }
+
       emit(AuthError(e.toString(), username));
     }
   }

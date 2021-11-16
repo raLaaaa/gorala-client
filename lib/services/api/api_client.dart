@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gorala/bloc/repositories/authentication_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 class ApiClient {
-  static final String baseUrl = dotenv.env['SERVER'];
-  static final Duration timeOutDuration = const Duration(seconds: 50);
+  static final String baseUrl = kIsWeb ? dotenv.env['SERVER_LOCAL'] : dotenv.env['SERVER'];
+  static final Duration timeOutDuration = const Duration(seconds: 10);
   static final Client httpClient = http.Client();
 
   static Future<http.Response> getRequest(String url) async {

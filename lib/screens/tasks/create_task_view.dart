@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/task_cubit.dart';
@@ -36,7 +37,15 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments as CreateTaskArguments;
-    _initialDate = args.initialDate;
+
+    if(args != null) {
+      _initialDate = args.initialDate;
+    }
+    else{
+      _initialDate = DateTime.now();
+    }
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -52,18 +61,23 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   }
 
   Widget _CreateTaskForm(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _selectTaskDate(context),
-            Divider(),
-            _buildTaskDescription(context),
-            _CreateTaskButton(context),
-          ],
+    return Center(
+      child: Container(
+        width: kIsWeb ? 700 : MediaQuery.of(context).size.width,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _selectTaskDate(context),
+                Divider(),
+                _buildTaskDescription(context),
+                _CreateTaskButton(context),
+              ],
+            ),
+          ),
         ),
       ),
     );

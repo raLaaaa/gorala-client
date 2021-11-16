@@ -27,8 +27,6 @@ class TaskCubit extends Cubit<TaskState> {
     emit(TasksLoading());
     Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDate(time);
 
-
-
     if (tasks == null) {
       emit(TasksLoaded(_cachedEntries));
       return;
@@ -48,6 +46,7 @@ class TaskCubit extends Cubit<TaskState> {
     }
 
     _cachedEntries.addAll(tasks);
+
     emit(TasksLoaded(_cachedEntries));
   }
 
@@ -100,5 +99,10 @@ class TaskCubit extends Cubit<TaskState> {
     }
 
     emit(TasksLoaded(_cachedEntries));
+  }
+
+  void clearCachedTasks() async {
+    _cachedEntries.clear();
+    emit(TasksEmpty());
   }
 }

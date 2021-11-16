@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
@@ -69,19 +70,20 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          hoverColor: Colors.black,
-          elevation: 10,
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              '/add',
-              arguments: CreateTaskArguments(_currentSelectedDate),
-            );
-          },
-          backgroundColor: kTitleTextColor,
-          child: Icon(
-            Icons.add,
-          )),
+        hoverColor: Colors.black,
+        elevation: 10,
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/add',
+            arguments: CreateTaskArguments(_currentSelectedDate),
+          );
+        },
+        backgroundColor: kTitleTextColor,
+        child: Icon(
+          Icons.add,
+        ),
+      ),
       appBar: AppBar(
         title: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
         actions: [
@@ -91,6 +93,11 @@ class _MainScreenState extends State<MainScreen> {
               _selectDate(context);
             },
           ),
+          kIsWeb
+              ? SizedBox(
+                  width: 5,
+                )
+              : SizedBox(width: 0),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
@@ -99,42 +106,45 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        onPageChanged: (index) {
-          _handlePageChange(index);
-        },
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (context, _index) {
-          return RefreshIndicator(
-            color: kTitleTextColor,
-            onRefresh: () {
-              return _refreshTasks(context);
-            },
-            child: BlocBuilder<TaskCubit, TaskState>(
-              builder: (context, state) {
-                if (state is TasksLoading) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (state is TasksError) {
-                  return Center(child: Text(state.message));
-                } else if (state is TasksLoaded) {
-                  DateTime dateToFetch = DateTime.now().toUtc();
-                  dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
-                  DateTime roundedDate = DateTime(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0).toUtc();
-                  var tasksForThisDay = state.tasks[roundedDate];
-
-                  if (tasksForThisDay != null) {
-                    return _buildEntryForPageController(tasksForThisDay);
-                  } else {
-                    return _buildEntryForPageController([]);
-                  }
-                } else {
-                  return Text('this is a bug: ' + state.toString());
-                }
+      body: Container(
+        color: kBgDarkColor,
+        child: PageView.builder(
+          controller: _pageController,
+          onPageChanged: (index) {
+            _handlePageChange(index);
+          },
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (context, _index) {
+            return RefreshIndicator(
+              color: kTitleTextColor,
+              onRefresh: () {
+                return _refreshTasks(context);
               },
-            ),
-          );
-        },
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  if (state is TasksLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is TasksError) {
+                    return Center(child: Text(state.message));
+                  } else if (state is TasksLoaded) {
+                    DateTime dateToFetch = DateTime.now();
+                    dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
+                    DateTime roundedDate = DateTime.utc(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
+                    var tasksForThisDay = state.tasks[roundedDate];
+
+                    if (tasksForThisDay != null) {
+                      return _buildEntryForPageController(tasksForThisDay);
+                    } else {
+                      return _buildEntryForPageController([]);
+                    }
+                  } else {
+                    return Text('this is a bug: ' + state.toString());
+                  }
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -206,31 +216,40 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildEntryForPageController(List<Task> tasks) {
     if (tasks.isEmpty) {
-      return Container(color: kBgDarkColor, child: _buildIfTasksEmpty());
+      return Container(child: _buildIfTasksEmpty());
     }
 
-    return Responsive(
-      mobile: ListOfTasks(
-        taskList: tasks,
-      ),
-      tablet: Row(
-        children: [
-          Expanded(
-            flex: 6,
-            child: ListOfTasks(
-              taskList: tasks,
-            ),
+    return Center(
+      child: Container(
+        width: kIsWeb ? 900 : MediaQuery.of(context).size.width,
+        child: Responsive(
+          mobile: ListOfTasks(
+            taskList: tasks,
           ),
-        ],
-      ),
-      desktop: Row(
-        children: [
-          Expanded(
-            child: ListOfTasks(
-              taskList: tasks,
-            ),
+          tablet: Row(
+            children: [
+              Expanded(
+                flex: 6,
+                child: ListOfTasks(
+                  taskList: tasks,
+                ),
+              ),
+            ],
           ),
-        ],
+          desktop: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  width: 1400,
+                  child: ListOfTasks(
+                    taskList: tasks,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -284,6 +303,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    taskCubit.clearCachedTasks();
+
     final authCubit = BlocProvider.of<AuthCubit>(context);
     authCubit.logout();
   }

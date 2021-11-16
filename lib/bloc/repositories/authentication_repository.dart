@@ -31,6 +31,19 @@ class AuthRepository {
     return User(userMail, userID.toString(), userToken);
   }
 
+  Future<bool> register(String username, String password) async {
+    var data = {'username': username, 'password': password};
+
+    dynamic response = await ApiClient.postRequest('/register', data);
+
+    if(response.statusCode != 200){
+      return false;
+    }
+
+    return true;
+  }
+
+
   Future<bool> checkLogin() async {
     dynamic response = await ApiClient.getRequest('/api/v1/checklogin');
 

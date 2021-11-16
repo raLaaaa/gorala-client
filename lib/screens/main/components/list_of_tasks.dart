@@ -19,8 +19,6 @@ class ListOfTasks extends StatefulWidget {
 }
 
 class _ListOfTasksState extends State<ListOfTasks> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     super.initState();
@@ -28,18 +26,15 @@ class _ListOfTasksState extends State<ListOfTasks> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Container(
-        child: _buildListOfTasks(),
-      ),
+    return Container(
+      color: kBgDarkColor,
+      child: _buildListOfTasks(),
     );
   }
 
   Widget _buildListOfTasks() {
     return Container(
       padding: EdgeInsets.only(top: kIsWeb ? kDefaultPadding : 0),
-      color: kBgDarkColor,
       child: SafeArea(
         right: false,
         child: ListView.builder(

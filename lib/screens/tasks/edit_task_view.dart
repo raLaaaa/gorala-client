@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/task_cubit.dart';
@@ -38,9 +39,15 @@ class _EditTaskViewState extends State<EditTaskView> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments as EditTaskArguments;
-    _taskToEdit = args.task;
-    _initialDate = _taskToEdit.executionDate;
-    _taskDescription = _taskToEdit.description;
+
+    if(args != null) {
+      _taskToEdit = args.task;
+      _initialDate = _taskToEdit.executionDate;
+      _taskDescription = _taskToEdit.description;
+    }
+    else{
+      return Text('404 - Invalid Data');
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -71,18 +78,23 @@ class _EditTaskViewState extends State<EditTaskView> {
   }
 
   Widget _EditTaskForm(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _selectTaskDate(context),
-            Divider(),
-            _buildTaskDescription(context),
-            _editTaskButton(context),
-          ],
+    return Center(
+      child: Container(
+        width: kIsWeb ? 700 : MediaQuery.of(context).size.width,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _selectTaskDate(context),
+                Divider(),
+                _buildTaskDescription(context),
+                _editTaskButton(context),
+              ],
+            ),
+          ),
         ),
       ),
     );

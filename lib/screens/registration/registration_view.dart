@@ -2,32 +2,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
-import 'package:gorala/constants.dart';
 import 'package:gorala/utils/email_validator.dart';
 
-class LoginView extends StatefulWidget {
+import '../../constants.dart';
+
+class RegistrationView extends StatefulWidget {
   final String errorMessage;
   final String userName;
 
-  const LoginView({
+  const RegistrationView({
     Key key,
     this.userName,
     this.errorMessage,
   }) : super(key: key);
 
   @override
-  _LoginViewState createState() => _LoginViewState();
+  _RegistrationViewState createState() => _RegistrationViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _RegistrationViewState extends State<RegistrationView> {
   final _formKey = GlobalKey<FormState>();
   String _username = '';
   String _password = '';
+  String _passwordRepeat = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _loginForm(context),
+      body: _RegistrationForm(context),
     );
   }
 
@@ -41,33 +43,30 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-  Widget _loginForm(BuildContext context) {
-    return Container(
-      width: kIsWeb ? 1000 : MediaQuery.of(context).size.width,
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            children: [
-              Spacer(),
-              //_buildHeadline(context),
-              Center(
-                child: Column(children: [
-                  _usernameField(context),
-                  _passwordField(context),
-                  _loginButton(context),
-                ]),
-              ),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                _registerButton(context),
-                _forgotPasswordButton(context)
-              ],),
-
-            ],
+  Widget _RegistrationForm(BuildContext context) {
+    return Center(
+      child: Container(
+        width: kIsWeb ? 1000 : MediaQuery.of(context).size.width,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              children: [
+                Spacer(),
+                //_buildHeadline(context),
+                Center(
+                  child: Column(children: [
+                    _usernameField(context),
+                    _passwordField(context),
+                    _passwordRepeatField(context),
+                    _registrationButton(context),
+                  ]),
+                ),
+                Spacer(),
+                _alreadyHaveAnAccount(context)
+              ],
+            ),
           ),
         ),
       ),
@@ -77,7 +76,7 @@ class _LoginViewState extends State<LoginView> {
   Widget _buildHeadline(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: kTitleTextColor),),
+      child: Text('Registration', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: kTitleTextColor)),
     );
   }
 
@@ -112,6 +111,11 @@ class _LoginViewState extends State<LoginView> {
           return 'Please enter some text';
         }
         _password = value;
+
+        if (_password != _passwordRepeat) {
+          return 'Your passwords dont match';
+        }
+
         return null;
       },
       obscureText: true,
@@ -124,7 +128,32 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _loginButton(BuildContext context) {
+  Widget _passwordRepeatField(BuildContext context) {
+    return TextFormField(
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter some text';
+        }
+        _passwordRepeat = value;
+
+        if (_password != _passwordRepeat) {
+          return 'Your passwords dont match';
+        }
+        return null;
+      },
+      obscureText: true,
+      keyboardType: TextInputType.visiblePassword,
+      autofillHints: [AutofillHints.password],
+      decoration: InputDecoration(
+        icon: SizedBox(
+          width: 24,
+        ),
+        labelText: 'Repeat password',
+      ),
+    );
+  }
+
+  Widget _registrationButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
@@ -138,54 +167,42 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 )
               : SizedBox(),
-          Container(
-            width: 90,
-            child: ElevatedButton(
-              onPressed: () {
-                _submitLogin(context);
-              },
-              child: Text('Login'),
-            ),
+          ElevatedButton(
+            onPressed: () {
+              _submitRegistration(context);
+            },
+            child: Text('Submit Registration'),
           ),
         ],
       ),
     );
   }
 
-  Widget _registerButton(BuildContext context) {
+  Widget _alreadyHaveAnAccount(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/register');
+          Navigator.pushNamed(context, '/');
         },
         child: Text(
-          'Dont have an account?',
+          'Already have an account?',
           style: TextStyle(decoration: TextDecoration.underline),
         ),
       ),
     );
   }
 
-  Widget _forgotPasswordButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, '/register');
-        },
-        child: Text(
-          'Forgot password?',
-          style: TextStyle(decoration: TextDecoration.underline),
-        ),
-      ),
-    );
-  }
-
-  void _submitLogin(BuildContext context) {
+  void _submitRegistration(BuildContext context) {
     if (_formKey.currentState.validate()) {
       final authCubit = BlocProvider.of<AuthCubit>(context);
-      authCubit.performAuth(_username, _password);
+      authCubit.register(_username, _password);
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/success',
+        (Route<dynamic> route) => false,
+      );
     }
   }
 }

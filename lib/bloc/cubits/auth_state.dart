@@ -42,3 +42,19 @@ class AuthError extends AuthState {
   @override
   int get hashCode => message.hashCode;
 }
+
+class RegistrationError extends AuthState {
+  final String message;
+
+  const RegistrationError(this.message);
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is RegistrationError && o.message == message;
+  }
+
+  @override
+  int get hashCode => message.hashCode;
+}
