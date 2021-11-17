@@ -172,7 +172,7 @@ class _LoginViewState extends State<LoginView> {
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/register');
+          Navigator.pushNamed(context, '/resetpassword');
         },
         child: Text(
           'Forgot password?',

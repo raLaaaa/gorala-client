@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SuccessfulRegistrationView extends StatelessWidget {
+class SuccessfulResetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,7 +8,7 @@ class SuccessfulRegistrationView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('You will receive an email to confirm your account.', textAlign: TextAlign.center),
+            Text('You will receive an email with further instructions to receive your password.', textAlign: TextAlign.center,),
             SizedBox(height: 8,),
             ElevatedButton(
               onPressed: () {

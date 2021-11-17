@@ -1,19 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gorala/bloc/cubits/auth_cubit.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gorala/services/api/api_client.dart';
 import 'package:gorala/utils/email_validator.dart';
-
-import '../../constants.dart';
+import 'package:http/http.dart' as http;
 
 class ForgotPasswordView extends StatefulWidget {
-  final String errorMessage;
-  final String userName;
-
   const ForgotPasswordView({
     Key key,
-    this.userName,
-    this.errorMessage,
   }) : super(key: key);
 
   @override
@@ -23,8 +19,7 @@ class ForgotPasswordView extends StatefulWidget {
 class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   final _formKey = GlobalKey<FormState>();
   String _username = '';
-  String _password = '';
-  String _passwordRepeat = '';
+  String _errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +31,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   @override
   void initState() {
     super.initState();
-    final authCubit = BlocProvider.of<AuthCubit>(context);
-
-    if (authCubit.state is Foreign) {
-      authCubit.checkIfAuthenticated();
-    }
   }
 
   Widget _ForgotPasswordForm(BuildContext context) {
@@ -58,25 +48,16 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 Center(
                   child: Column(children: [
                     _usernameField(context),
-                    _passwordField(context),
-                    _passwordRepeatField(context),
                     _ForgotPasswordButton(context),
                   ]),
                 ),
                 Spacer(),
-                _alreadyHaveAnAccount(context)
+                _rememberedYourPassword(context)
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHeadline(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text('ForgotPassword', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: kTitleTextColor)),
     );
   }
 
@@ -94,7 +75,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         _username = value;
         return null;
       },
-      initialValue: widget.userName ?? '',
       keyboardType: TextInputType.emailAddress,
       autofillHints: [AutofillHints.email],
       decoration: InputDecoration(
@@ -104,81 +84,32 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
     );
   }
 
-  Widget _passwordField(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter some text';
-        }
-        _password = value;
-
-        if (_password != _passwordRepeat) {
-          return 'Your passwords dont match';
-        }
-
-        return null;
-      },
-      obscureText: true,
-      keyboardType: TextInputType.visiblePassword,
-      autofillHints: [AutofillHints.password],
-      decoration: InputDecoration(
-        icon: Icon(Icons.security),
-        labelText: 'Password',
-      ),
-    );
-  }
-
-  Widget _passwordRepeatField(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter some text';
-        }
-        _passwordRepeat = value;
-
-        if (_password != _passwordRepeat) {
-          return 'Your passwords dont match';
-        }
-        return null;
-      },
-      obscureText: true,
-      keyboardType: TextInputType.visiblePassword,
-      autofillHints: [AutofillHints.password],
-      decoration: InputDecoration(
-        icon: SizedBox(
-          width: 24,
-        ),
-        labelText: 'Repeat password',
-      ),
-    );
-  }
-
   Widget _ForgotPasswordButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          widget.errorMessage != null
+          _errorMessage != null
               ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              widget.errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-          )
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
               : SizedBox(),
           ElevatedButton(
             onPressed: () {
               _submitForgotPassword(context);
             },
-            child: Text('Submit ForgotPassword'),
+            child: Text('Submit'),
           ),
         ],
       ),
     );
   }
 
-  Widget _alreadyHaveAnAccount(BuildContext context) {
+  Widget _rememberedYourPassword(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -193,16 +124,31 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
     );
   }
 
-  void _submitForgotPassword(BuildContext context) {
+  void _submitForgotPassword(BuildContext context) async {
     if (_formKey.currentState.validate()) {
-      final authCubit = BlocProvider.of<AuthCubit>(context);
-      authCubit.register(_username, _password);
+      var baseUrl = kIsWeb ? dotenv.env['SERVER_LOCAL'] : dotenv.env['SERVER'];
+      var uri = baseUrl + '/reset/request';
+      var data = {'username': _username};
 
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/success',
+      try {
+        var response = await http.post(uri, body: jsonEncode(data), headers: {'Content-Type': 'application/json'}).timeout(ApiClient.timeOutDuration);
+
+        if (response.statusCode != 200) {
+          setState(() {
+            _errorMessage = 'We did not find a user with this mail';
+          });
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/successreset',
             (Route<dynamic> route) => false,
-      );
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
     }
   }
 }

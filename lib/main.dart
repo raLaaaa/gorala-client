@@ -6,6 +6,7 @@ import 'package:gorala/constants.dart';
 import 'package:gorala/screens/loading/loading_screen.dart';
 import 'package:gorala/screens/login/forgot_password_view.dart';
 import 'package:gorala/screens/login/login_view.dart';
+import 'package:gorala/screens/login/successful_reset_request.dart';
 import 'package:gorala/screens/main/main_screen.dart';
 import 'package:gorala/screens/registration/registration_view.dart';
 import 'package:gorala/screens/registration/successful_registration_view.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => _buildEntryScreen(),
           '/success': (context) => SuccessfulRegistrationView(),
+          '/successreset': (context) => SuccessfulResetView(),
           '/register': (context) => _buildRegisterScreen(),
           '/resetpassword': (context) => _buildForogtPasswordScreen(),
           '/add': (context) => _buildCreateTaskScreen(),
