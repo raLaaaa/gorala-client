@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
+import 'package:gorala/components/custom_divider.dart';
+import 'package:gorala/components/draw_triangle.dart';
 import 'package:gorala/constants.dart';
 import 'package:gorala/utils/email_validator.dart';
 
@@ -27,7 +29,12 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _loginForm(context),
+      body: Stack(
+        children: [
+          Align(alignment: Alignment.topRight, child: Triangle(color: kTitleTextColor,)),
+          _loginForm(context),
+        ],
+      ),
     );
   }
 
@@ -42,32 +49,37 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _loginForm(BuildContext context) {
-    return Container(
-      width: kIsWeb ? 1000 : MediaQuery.of(context).size.width,
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            children: [
-              Spacer(),
-              //_buildHeadline(context),
-              Center(
-                child: Column(children: [
-                  _usernameField(context),
-                  _passwordField(context),
-                  _loginButton(context),
-                ]),
-              ),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                _registerButton(context),
-                _forgotPasswordButton(context)
-              ],),
+    return Center(
+      child: Container(
+        width: kIsWeb ? 1000 : MediaQuery.of(context).size.width,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              children: [
+                _buildHeadline(context),
+                SizedBox(height: 70),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                        children: [
+                      _usernameField(context),
+                      _passwordField(context),
+                      _loginButton(context),
+                    ]),
+                  ),
+                ),
 
-            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                  _registerButton(context),
+                  _forgotPasswordButton(context)
+                ],),
+
+              ],
+            ),
           ),
         ),
       ),
@@ -75,9 +87,22 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildHeadline(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: kTitleTextColor),),
+    return Padding(
+      padding: const EdgeInsets.only(top: 140),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Login to your\naccount', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: kTitleTextColor),),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+                width: double.infinity,
+                child: CustomDivider()),
+          )
+        ],
+      ),
     );
   }
 
@@ -129,7 +154,7 @@ class _LoginViewState extends State<LoginView> {
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          widget.errorMessage != null
+          widget.errorMessage != null &&  widget.errorMessage.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
@@ -139,7 +164,7 @@ class _LoginViewState extends State<LoginView> {
                 )
               : SizedBox(),
           Container(
-            width: 90,
+            width: kDefaultPrimaryButtonWidth,
             child: ElevatedButton(
               onPressed: () {
                 _submitLogin(context);

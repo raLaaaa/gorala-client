@@ -3,9 +3,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gorala/components/custom_divider.dart';
+import 'package:gorala/components/draw_triangle.dart';
 import 'package:gorala/services/api/api_client.dart';
 import 'package:gorala/utils/email_validator.dart';
 import 'package:http/http.dart' as http;
+
+import '../../constants.dart';
 
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({
@@ -24,7 +28,12 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _ForgotPasswordForm(context),
+      body: Stack(
+        children: [
+          Align(alignment: Alignment.topRight, child: Triangle(color: kTitleTextColor,)),
+          _ForgotPasswordForm(context)
+        ],
+      ),
     );
   }
 
@@ -43,15 +52,16 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             padding: EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
-                Spacer(),
-                //_buildHeadline(context),
-                Center(
-                  child: Column(children: [
-                    _usernameField(context),
-                    _ForgotPasswordButton(context),
-                  ]),
+                _buildHeadline(context),
+                SizedBox(height: 80),
+                Expanded(
+                  child: Center(
+                    child: Column(children: [
+                      _usernameField(context),
+                      _ForgotPasswordButton(context),
+                    ]),
+                  ),
                 ),
-                Spacer(),
                 _rememberedYourPassword(context)
               ],
             ),
@@ -89,7 +99,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          _errorMessage != null
+          _errorMessage != null && _errorMessage.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
@@ -98,12 +108,35 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                   ),
                 )
               : SizedBox(),
-          ElevatedButton(
-            onPressed: () {
-              _submitForgotPassword(context);
-            },
-            child: Text('Submit'),
+          SizedBox(
+            width: kDefaultPrimaryButtonWidth,
+            child: ElevatedButton(
+              onPressed: () {
+                _submitForgotPassword(context);
+              },
+              child: Text('Submit'),
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeadline(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 140),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Forgot your\npassword?', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: kTitleTextColor),),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+                width: double.infinity,
+                child: CustomDivider()),
+          )
         ],
       ),
     );

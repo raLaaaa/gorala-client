@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
+import 'package:gorala/components/custom_divider.dart';
+import 'package:gorala/components/draw_triangle.dart';
 import 'package:gorala/utils/email_validator.dart';
 
 import '../../constants.dart';
@@ -29,7 +31,12 @@ class _RegistrationViewState extends State<RegistrationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _RegistrationForm(context),
+      body: Stack(
+        children: [
+          Align(alignment: Alignment.topRight, child: Triangle(color: kTitleTextColor,)),
+          _RegistrationForm(context)
+        ],
+      ),
     );
   }
 
@@ -53,9 +60,9 @@ class _RegistrationViewState extends State<RegistrationView> {
             padding: EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
-                Spacer(),
-                //_buildHeadline(context),
-                Center(
+                _buildHeadline(context),
+                SizedBox(height: 40),
+                Expanded(
                   child: Column(children: [
                     _usernameField(context),
                     _passwordField(context),
@@ -63,7 +70,6 @@ class _RegistrationViewState extends State<RegistrationView> {
                     _registrationButton(context),
                   ]),
                 ),
-                Spacer(),
                 _alreadyHaveAnAccount(context)
               ],
             ),
@@ -74,9 +80,22 @@ class _RegistrationViewState extends State<RegistrationView> {
   }
 
   Widget _buildHeadline(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text('Registration', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: kTitleTextColor)),
+    return Padding(
+      padding: const EdgeInsets.only(top: 140),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Register a new\naccount', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: kTitleTextColor),),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+                width: double.infinity,
+                child: CustomDivider()),
+          )
+        ],
+      ),
     );
   }
 
@@ -158,7 +177,7 @@ class _RegistrationViewState extends State<RegistrationView> {
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
-          widget.errorMessage != null
+          widget.errorMessage != null &&  widget.errorMessage.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
@@ -167,11 +186,14 @@ class _RegistrationViewState extends State<RegistrationView> {
                   ),
                 )
               : SizedBox(),
-          ElevatedButton(
-            onPressed: () {
-              _submitRegistration(context);
-            },
-            child: Text('Submit Registration'),
+          SizedBox(
+            width: kDefaultPrimaryButtonWidth,
+            child: ElevatedButton(
+              onPressed: () {
+                _submitRegistration(context);
+              },
+              child: Text('Submit'),
+            ),
           ),
         ],
       ),
