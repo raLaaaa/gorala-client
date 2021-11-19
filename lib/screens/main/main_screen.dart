@@ -70,8 +70,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        hoverColor: Colors.black,
-        elevation: 10,
+        highlightElevation: 0,
+        elevation: 0,
+        tooltip: 'Create a new task',
         onPressed: () {
           Navigator.pushNamed(
             context,
@@ -85,9 +86,10 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       appBar: AppBar(
-        title: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
+        title: kIsWeb ? Text(_dateFormat.format(_currentSelectedDate) + ' - Your tasks', style: TextStyle(fontSize: 28)) : Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
         actions: [
           IconButton(
+            tooltip: 'Calender view',
             icon: Icon(Icons.calendar_today),
             onPressed: () {
               _selectDate(context);
@@ -99,6 +101,7 @@ class _MainScreenState extends State<MainScreen> {
                 )
               : SizedBox(width: 0),
           IconButton(
+            tooltip: 'Logout',
             icon: Icon(Icons.logout),
             onPressed: () {
               _logout(context);
@@ -132,11 +135,13 @@ class _MainScreenState extends State<MainScreen> {
                     DateTime roundedDate = DateTime.utc(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
                     var tasksForThisDay = state.tasks[roundedDate];
 
-                    if (tasksForThisDay != null) {
-                      return _buildEntryForPageController(tasksForThisDay);
-                    } else {
-                      return _buildEntryForPageController([]);
-                    }
+                    return Stack(
+                      children: [
+                        kIsWeb && _index == _currentIndex ? _buildLeftButtonForWeb() : SizedBox(),
+                        kIsWeb && _index == _currentIndex ? _buildRightButtonForWeb() : SizedBox(),
+                        tasksForThisDay != null ? _buildEntryForPageController(tasksForThisDay) : _buildEntryForPageController([])
+                      ],
+                    );
                   } else {
                     return Text('this is a bug: ' + state.toString());
                   }
@@ -145,6 +150,54 @@ class _MainScreenState extends State<MainScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildLeftButtonForWeb() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            decoration: BoxDecoration(
+              color: kTitleTextColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+                bottomLeft: Radius.circular(40),
+              ),
+            ),
+            child: IconButton(icon: const Icon(Icons.chevron_left, color: Colors.white,), tooltip: 'Previous page', onPressed: () {
+              setState(() {
+                _pageController.previousPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+              });
+            }),
+          )),
+    );
+  }
+
+  Widget _buildRightButtonForWeb() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Container(
+            decoration: BoxDecoration(
+              color: kTitleTextColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+                bottomLeft: Radius.circular(40),
+              ),
+            ),
+            child: IconButton(icon: const Icon(Icons.chevron_right, color: Colors.white,), tooltip: 'Next page', onPressed: () {
+              setState(() {
+                _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+              });
+            })),
       ),
     );
   }

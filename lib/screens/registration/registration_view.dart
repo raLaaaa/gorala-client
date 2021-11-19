@@ -101,6 +101,9 @@ class _RegistrationViewState extends State<RegistrationView> {
 
   Widget _usernameField(BuildContext context) {
     return TextFormField(
+      onFieldSubmitted: (value) {
+        _submitRegistration(context);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
@@ -125,6 +128,9 @@ class _RegistrationViewState extends State<RegistrationView> {
 
   Widget _passwordField(BuildContext context) {
     return TextFormField(
+      onFieldSubmitted: (value) {
+        _submitRegistration(context);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
@@ -149,6 +155,9 @@ class _RegistrationViewState extends State<RegistrationView> {
 
   Widget _passwordRepeatField(BuildContext context) {
     return TextFormField(
+      onFieldSubmitted: (value) {
+        _submitRegistration(context);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';

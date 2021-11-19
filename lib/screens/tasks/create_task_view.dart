@@ -118,11 +118,17 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
         }
+
+        if(value.length >= 9000){
+          return 'A lot to do, huh? Maybe a little less would help..';
+        }
+
         _taskDescription = value;
         return null;
       },
       keyboardType: TextInputType.multiline,
       maxLines: null,
+      maxLength: maxLengthOfTaskDescriptions,
       decoration: InputDecoration(
         labelText: 'Task description',
       ),
@@ -143,11 +149,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                   ),
                 )
               : SizedBox(),
-          ElevatedButton(
-            onPressed: () {
-              submitCreateTask(context);
-            },
-            child: Text('Create Task'),
+          Container(
+            width: kDefaultPrimaryButtonWidth,
+            child: ElevatedButton(
+              onPressed: () {
+                submitCreateTask(context);
+              },
+              child: Text('Create Task'),
+            ),
           ),
         ],
       ),

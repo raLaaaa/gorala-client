@@ -73,6 +73,9 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
   Widget _usernameField(BuildContext context) {
     return TextFormField(
+      onFieldSubmitted: (value) {
+        _submitForgotPassword(context);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';

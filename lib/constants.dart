@@ -7,3 +7,5 @@ const kTextColor = Color(0xFF4D5875);
 
 const kDefaultPadding = 20.0;
 const kDefaultPrimaryButtonWidth = 130.0;
+
+const maxLengthOfTaskDescriptions = 1000;

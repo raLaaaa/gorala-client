@@ -54,6 +54,7 @@ class _EditTaskViewState extends State<EditTaskView> {
         title: Text('Edit your task', style: TextStyle(fontSize: 28)),
         actions: [
           IconButton(
+            tooltip: 'Delete',
             icon: Icon(Icons.delete),
             onPressed: () {
               final taskCubit = BlocProvider.of<TaskCubit>(context);
@@ -122,6 +123,7 @@ class _EditTaskViewState extends State<EditTaskView> {
               SizedBox(width: 3),
               Icon(
                 Icons.edit,
+                semanticLabel: 'Edit',
                 size: 15,
               )
             ]))
@@ -135,12 +137,18 @@ class _EditTaskViewState extends State<EditTaskView> {
         if (value == null || value.isEmpty) {
           return 'Please enter some text';
         }
+
+        if(value.length >= 9000){
+          return 'A lot to do, huh? Maybe a little less would help..';
+        }
+
         _taskDescription = value;
         return null;
       },
       initialValue: _taskDescription,
       keyboardType: TextInputType.multiline,
       maxLines: null,
+      maxLength: maxLengthOfTaskDescriptions,
       decoration: InputDecoration(
         labelText: 'Task description',
       ),
@@ -161,11 +169,14 @@ class _EditTaskViewState extends State<EditTaskView> {
                   ),
                 )
               : SizedBox(),
-          ElevatedButton(
-            onPressed: () {
-              submitEditTask(context);
-            },
-            child: Text('Edit Task'),
+          Container(
+            width: kDefaultPrimaryButtonWidth,
+            child: ElevatedButton(
+              onPressed: () {
+                submitEditTask(context);
+              },
+              child: Text('Edit Task'),
+            ),
           ),
         ],
       ),
