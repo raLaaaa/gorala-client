@@ -31,6 +31,7 @@ class _RegistrationViewState extends State<RegistrationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Align(alignment: Alignment.topRight, child: Triangle(color: kTitleTextColor,)),
@@ -61,7 +62,7 @@ class _RegistrationViewState extends State<RegistrationView> {
             child: Column(
               children: [
                 _buildHeadline(context),
-                SizedBox(height: 40),
+                SizedBox(height: 30),
                 Expanded(
                   child: Column(children: [
                     _usernameField(context),
@@ -81,7 +82,7 @@ class _RegistrationViewState extends State<RegistrationView> {
 
   Widget _buildHeadline(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 140),
+      padding: const EdgeInsets.only(top: 100),
       child: Column(
         children: [
           Align(

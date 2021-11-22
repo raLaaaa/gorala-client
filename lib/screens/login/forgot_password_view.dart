@@ -28,6 +28,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Align(alignment: Alignment.topRight, child: Triangle(color: kTitleTextColor,)),
@@ -53,7 +54,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             child: Column(
               children: [
                 _buildHeadline(context),
-                SizedBox(height: 80),
+                SizedBox(height: 30),
                 Expanded(
                   child: Center(
                     child: Column(children: [
@@ -127,7 +128,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
   Widget _buildHeadline(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 140),
+      padding: const EdgeInsets.only(top: 100),
       child: Column(
         children: [
           Align(

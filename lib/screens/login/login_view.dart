@@ -29,6 +29,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Align(
@@ -63,7 +64,7 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               children: [
                 _buildHeadline(context),
-                SizedBox(height: 70),
+                SizedBox(height: 30),
                 Expanded(
                   child: Center(
                     child: Column(children: [
@@ -87,7 +88,7 @@ class _LoginViewState extends State<LoginView> {
 
   Widget _buildHeadline(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 140),
+      padding: const EdgeInsets.only(top: 100),
       child: Column(
         children: [
           Align(
