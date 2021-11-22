@@ -62,20 +62,23 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   Widget _CreateTaskForm(BuildContext context) {
     return Center(
-      child: Container(
-        width: kIsWeb ? 700 : MediaQuery.of(context).size.width,
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _selectTaskDate(context),
-                Divider(),
-                _buildTaskDescription(context),
-                _CreateTaskButton(context),
-              ],
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          width: kIsWeb ? 700 : MediaQuery.of(context).size.width,
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _selectTaskDate(context),
+                  Divider(),
+                  _buildTaskDescription(context),
+                  _CreateTaskButton(context),
+                ],
+              ),
             ),
           ),
         ),
