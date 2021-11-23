@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gorala/bloc/cubits/task_cubit.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/screens/tasks/edit_task_view.dart';
 
@@ -47,6 +49,18 @@ class _ListOfTasksState extends State<ListOfTasks> {
                 '/edit',
                 arguments: EditTaskArguments(widget.taskList[index]),
               );
+            },
+            toggleFinish: () {
+              var localTask = widget.taskList[index];
+              Task editedTask = Task(localTask.id, localTask.description, !localTask.isFinished, localTask.executionDate);
+
+              setState(() {
+                widget.taskList[index] = editedTask;
+              });
+
+              final taskCubit = BlocProvider.of<TaskCubit>(context);
+              taskCubit.changeTaskStatusSeamless(editedTask);
+
             },
           ),
         ),

@@ -86,13 +86,24 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       appBar: AppBar(
-        title: kIsWeb ? Text(_dateFormat.format(_currentSelectedDate) + ' - Your tasks', style: TextStyle(fontSize: 28)) : Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
+        title: InkWell(
+          onTap: () {
+            setState(() {
+              _selectDate(context);
+            });
+          },
+          child: Row(
+            children: [
+              Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
+            ],
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Calender view',
             icon: Icon(Icons.calendar_today),
             onPressed: () {
-              _selectDate(context);
+              _pageController.jumpToPage(_initialPage);
             },
           ),
           kIsWeb
@@ -100,11 +111,15 @@ class _MainScreenState extends State<MainScreen> {
                   width: 5,
                 )
               : SizedBox(width: 0),
-          IconButton(
-            tooltip: 'Logout',
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              _logout(context);
+          PopupMenuButton<String>(
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'Logout'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
             },
           ),
         ],
@@ -154,6 +169,16 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void handleClick(String value) {
+    switch (value) {
+      case 'Logout':
+        _logout(context);
+        break;
+      case 'Settings':
+        break;
+    }
+  }
+
   Widget _buildLeftButtonForWeb() {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
@@ -169,11 +194,17 @@ class _MainScreenState extends State<MainScreen> {
                 bottomLeft: Radius.circular(40),
               ),
             ),
-            child: IconButton(icon: const Icon(Icons.chevron_left, color: Colors.white,), tooltip: 'Previous page', onPressed: () {
-              setState(() {
-                _pageController.previousPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
-              });
-            }),
+            child: IconButton(
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                ),
+                tooltip: 'Previous page',
+                onPressed: () {
+                  setState(() {
+                    _pageController.previousPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+                  });
+                }),
           )),
     );
   }
@@ -193,11 +224,17 @@ class _MainScreenState extends State<MainScreen> {
                 bottomLeft: Radius.circular(40),
               ),
             ),
-            child: IconButton(icon: const Icon(Icons.chevron_right, color: Colors.white,), tooltip: 'Next page', onPressed: () {
-              setState(() {
-                _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
-              });
-            })),
+            child: IconButton(
+                icon: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white,
+                ),
+                tooltip: 'Next page',
+                onPressed: () {
+                  setState(() {
+                    _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+                  });
+                })),
       ),
     );
   }
@@ -365,6 +402,10 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _refreshTasks(BuildContext context) async {
     final taskCubit = BlocProvider.of<TaskCubit>(context);
-    taskCubit.getAllTasksOfUserByDate(_currentSelectedDate);
+    taskCubit.getAllTasksOfUserByDateWithRangeForReload(_currentSelectedDate);
+
+    _stepsWentLeft = 0;
+    _stepsWentRight = 0;
+    _loadedRanges.clear();
   }
 }

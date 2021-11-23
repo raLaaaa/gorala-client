@@ -191,7 +191,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     if (_formKey.currentState.validate()) {
       DateTime date = _selectedDate ?? _initialDate;
 
-      Task toCreate = Task("", _taskDescription, date);
+      Task toCreate = Task("", _taskDescription, false, date);
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.createTask(toCreate);

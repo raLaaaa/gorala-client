@@ -57,9 +57,11 @@ class TaskRepository {
 
     if(response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
+
       Task task =Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
+        decodedBody['IsFinished'],
         DateTime.parse(decodedBody['ExecutionDate']),
       );
 
@@ -73,6 +75,7 @@ class TaskRepository {
     dynamic data = {
       "description": task.description,
       "executionDate": task.executionDate.toUtc().toIso8601String(),
+      "isFinished": task.isFinished
     };
 
      dynamic response = await ApiClient.putRequest(
@@ -83,6 +86,7 @@ class TaskRepository {
       Task task =Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
+        decodedBody['IsFinished'],
         DateTime.parse(decodedBody['ExecutionDate']),
       );
 
@@ -120,6 +124,7 @@ class TaskRepository {
           Task(
             entry['ID'].toString(),
             entry['Description'],
+            entry['IsFinished'],
             DateTime.parse(entry['ExecutionDate']),
           ),
         );
@@ -128,11 +133,14 @@ class TaskRepository {
           Task(
             entry['ID'].toString(),
             entry['Description'],
+            entry['IsFinished'],
             DateTime.parse(entry['ExecutionDate']),
           ),
         );
       }
     });
+
+
 
     return toReturn;
   }

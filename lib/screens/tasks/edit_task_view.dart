@@ -210,7 +210,7 @@ class _EditTaskViewState extends State<EditTaskView> {
   void submitEditTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
       DateTime date = _selectedDate ?? _initialDate;
-      Task editedTask = Task(_taskToEdit.id, _taskDescription, date);
+      Task editedTask = Task(_taskToEdit.id, _taskDescription, _taskToEdit.isFinished, date);
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.editTask(editedTask);

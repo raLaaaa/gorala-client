@@ -25,6 +25,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> getAllTasksOfUserByDate(DateTime time) async {
     emit(TasksLoading());
+
     Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDate(time);
 
     if (tasks == null) {
@@ -38,6 +39,21 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> getAllTasksOfUserByDateWithRange(DateTime time) async {
     emit(TasksLoading());
+    Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDateWithRange(time);
+
+    if (tasks == null) {
+      emit(TasksLoaded(_cachedEntries));
+      return;
+    }
+
+    _cachedEntries.addAll(tasks);
+
+    emit(TasksLoaded(_cachedEntries));
+  }
+
+  Future<void> getAllTasksOfUserByDateWithRangeForReload(DateTime time) async {
+    emit(TasksLoading());
+    _cachedEntries.clear();
     Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDateWithRange(time);
 
     if (tasks == null) {
@@ -72,11 +88,38 @@ class TaskCubit extends Cubit<TaskState> {
     Task editedTask = await _taskRepository.editTask(task);
 
     if (editedTask != null) {
-      _cachedEntries.forEach((key, value) {
-        value.removeWhere((element) => element.id == editedTask.id);
-      });
+      var index = -1;
 
-      _cachedEntries[editedTask.executionDate].add(editedTask);
+      for(int i = 0 ; i < _cachedEntries[editedTask.executionDate].length; i++ ) {
+        index = i;
+        if(_cachedEntries[editedTask.executionDate][i].id == editedTask.id){
+          break;
+        }
+      }
+
+      _cachedEntries[editedTask.executionDate][index] = editedTask;
+    } else {
+      emit(TasksError('Something broke'));
+      return;
+    }
+
+    emit(TasksLoaded(_cachedEntries));
+  }
+
+  Future<void> changeTaskStatusSeamless(Task task) async {
+    Task editedTask = await _taskRepository.editTask(task);
+
+    if (editedTask != null) {
+      var index = -1;
+
+      for(int i = 0 ; i < _cachedEntries[editedTask.executionDate].length; i++ ) {
+        index = i;
+         if(_cachedEntries[editedTask.executionDate][i].id == editedTask.id){
+           break;
+         }
+      }
+
+      _cachedEntries[editedTask.executionDate][index] = editedTask;
     } else {
       emit(TasksError('Something broke'));
       return;
