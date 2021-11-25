@@ -9,11 +9,13 @@ import '../../../constants.dart';
 import 'task_card.dart';
 
 class ListOfTasks extends StatefulWidget {
-  final List<Task> taskList;
+  final List<Task> openTasks;
+  final List<Task> finishedTasks;
 
   const ListOfTasks({
     Key key,
-    @required this.taskList,
+    @required this.openTasks,
+    @required this.finishedTasks,
   }) : super(key: key);
 
   @override
@@ -39,32 +41,81 @@ class _ListOfTasksState extends State<ListOfTasks> {
       padding: EdgeInsets.only(top: kIsWeb ? kDefaultPadding : 0),
       child: SafeArea(
         right: false,
-        child: ListView.builder(
-          itemCount: widget.taskList.length,
-          itemBuilder: (context, index) => TaskCard(
-            task: widget.taskList[index],
-            press: () {
-              Navigator.pushNamed(
-                context,
-                '/edit',
-                arguments: EditTaskArguments(widget.taskList[index]),
-              );
-            },
-            toggleFinish: () {
-              var localTask = widget.taskList[index];
-              Task editedTask = Task(localTask.id, localTask.description, !localTask.isFinished, localTask.executionDate);
-
-              setState(() {
-                widget.taskList[index] = editedTask;
-              });
-
-              final taskCubit = BlocProvider.of<TaskCubit>(context);
-              taskCubit.changeTaskStatusSeamless(editedTask);
-
-            },
-          ),
+        child: ListView(
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              itemCount: widget.openTasks.length,
+              itemBuilder: (context, index) => TaskCard(
+                  task: widget.openTasks[index],
+                  press: () {
+                    _onPressItemFromOpen(index);
+                  },
+                  toggleFinish: () {
+                    _finishTask(index);
+                  }),
+            ),
+            Divider(),
+            Text('FINISHED'),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              itemCount: widget.finishedTasks.length,
+              itemBuilder: (context, index) => TaskCard(
+                  task: widget.finishedTasks[index],
+                  press: () {
+                    _onPressItemFromFinish(index);
+                  },
+                  toggleFinish: () {
+                    _openTask(index);
+                  }),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void _onPressItemFromFinish(index) {
+    Navigator.pushNamed(
+      context,
+      '/edit',
+      arguments: EditTaskArguments(widget.finishedTasks[index]),
+    );
+  }
+
+  void _onPressItemFromOpen(index) {
+    Navigator.pushNamed(
+      context,
+      '/edit',
+      arguments: EditTaskArguments(widget.openTasks[index]),
+    );
+  }
+
+  void _finishTask(index) {
+    var localTask = widget.openTasks[index];
+    Task editedTask = Task(localTask.id, localTask.description, true, localTask.executionDate);
+
+    setState(() {
+      widget.finishedTasks.add(editedTask);
+      widget.openTasks.removeAt(index);
+    });
+
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    taskCubit.changeTaskStatusSeamless(editedTask);
+  }
+
+  void _openTask(index) {
+    var localTask = widget.finishedTasks[index];
+    Task editedTask = Task(localTask.id, localTask.description, false, localTask.executionDate);
+
+    setState(() {
+      widget.openTasks.add(editedTask);
+      widget.finishedTasks.removeAt(index);
+    });
+
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    taskCubit.changeTaskStatusSeamless(editedTask);
   }
 }

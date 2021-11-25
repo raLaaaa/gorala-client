@@ -148,13 +148,21 @@ class _MainScreenState extends State<MainScreen> {
                     DateTime dateToFetch = DateTime.now();
                     dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
                     DateTime roundedDate = DateTime.utc(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
-                    var tasksForThisDay = state.tasks[roundedDate];
+                    var allTasksForThisDay = state.tasks[roundedDate];
+                    var openTasksForThisDay = [];
+                    var finishedTasksForThisDay = [];
+
+                    if(allTasksForThisDay != null) {
+                      openTasksForThisDay = allTasksForThisDay.where((task) => !task.isFinished).toList();
+                      finishedTasksForThisDay = allTasksForThisDay.where((task) => task.isFinished).toList();
+                    }
+
 
                     return Stack(
                       children: [
                         kIsWeb && _index == _currentIndex ? _buildLeftButtonForWeb() : SizedBox(),
                         kIsWeb && _index == _currentIndex ? _buildRightButtonForWeb() : SizedBox(),
-                        tasksForThisDay != null ? _buildEntryForPageController(tasksForThisDay) : _buildEntryForPageController([])
+                        allTasksForThisDay != null ? _buildEntryForPageController(openTasksForThisDay, finishedTasksForThisDay) : _buildEntryForPageController([], [])
                       ],
                     );
                   } else {
@@ -304,8 +312,8 @@ class _MainScreenState extends State<MainScreen> {
     _currentIndex = index;
   }
 
-  Widget _buildEntryForPageController(List<Task> tasks) {
-    if (tasks.isEmpty) {
+  Widget _buildEntryForPageController(List<Task> openTasks, List<Task> finishedTasks) {
+    if (openTasks.isEmpty) {
       return Container(child: _buildIfTasksEmpty());
     }
 
@@ -314,14 +322,16 @@ class _MainScreenState extends State<MainScreen> {
         width: kIsWeb ? 900 : MediaQuery.of(context).size.width,
         child: Responsive(
           mobile: ListOfTasks(
-            taskList: tasks,
+            openTasks: openTasks,
+            finishedTasks: finishedTasks,
           ),
           tablet: Row(
             children: [
               Expanded(
                 flex: 6,
                 child: ListOfTasks(
-                  taskList: tasks,
+                  openTasks: openTasks,
+                  finishedTasks: finishedTasks,
                 ),
               ),
             ],
@@ -333,7 +343,8 @@ class _MainScreenState extends State<MainScreen> {
                 child: Container(
                   width: 1400,
                   child: ListOfTasks(
-                    taskList: tasks,
+                    openTasks: openTasks,
+                    finishedTasks: finishedTasks,
                   ),
                 ),
               ),

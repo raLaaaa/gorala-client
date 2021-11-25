@@ -39,6 +39,12 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: kDefaultPadding, vertical: kDefaultPadding / 5),
@@ -60,15 +66,15 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
                       TextSpan(
                         text: "${widget.task.description}",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                          decoration: widget.task.isFinished ? TextDecoration.lineThrough : TextDecoration.none,
-                          decorationThickness: 1.25
-                        ),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            decoration: widget.task.isFinished ? TextDecoration.lineThrough : TextDecoration.none,
+                            decorationThickness: 1.25),
                       ),
                     ),
                   ),
+                  Text(widget.task.isFinished.toString())
                 ],
               ),
             ),
@@ -83,16 +89,10 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
                 height: 26,
                 child: ElevatedButton(
                   onPressed: () {
-                    if(!_animationController.isAnimating) {
-                      if (!widget.task.isFinished) {
-                        _animationController.forward().whenComplete(() {
-                          widget.toggleFinish();
-                        });
-                      } else {
-                        _animationController.reverse().whenComplete(() {
-                          widget.toggleFinish();
-                        });
-                      }
+                    if (_animationController.isCompleted) {
+                      _animationController.reverse().whenComplete(() => {widget.toggleFinish(), _animationController.value = 1});
+                    } else if (_animationController.isDismissed) {
+                      _animationController.forward().whenComplete(() => {widget.toggleFinish(), _animationController.value = 0});
                     }
                   },
                   child: Center(
