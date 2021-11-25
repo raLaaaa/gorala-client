@@ -22,10 +22,25 @@ class ListOfTasks extends StatefulWidget {
   _ListOfTasksState createState() => _ListOfTasksState();
 }
 
-class _ListOfTasksState extends State<ListOfTasks> {
+class _ListOfTasksState extends State<ListOfTasks> with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  bool _hideFinishTasks = false;
+
   @override
   void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+      upperBound: 0.5,
+    );
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
   }
 
   @override
@@ -58,19 +73,21 @@ class _ListOfTasksState extends State<ListOfTasks> {
             ),
             widget.finishedTasks.isNotEmpty ? Divider() : SizedBox(),
             widget.finishedTasks.isNotEmpty ? SizedBox(child: _buildFinishedTasksHeadline()) : SizedBox(),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
-              itemCount: widget.finishedTasks.length,
-              itemBuilder: (context, index) => TaskCard(
-                  task: widget.finishedTasks[index],
-                  press: () {
-                    _onPressItemFromFinish(index);
-                  },
-                  toggleFinish: () {
-                    _openTask(index);
-                  }),
-            ),
+            !_hideFinishTasks
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: widget.finishedTasks.length,
+                    itemBuilder: (context, index) => TaskCard(
+                        task: widget.finishedTasks[index],
+                        press: () {
+                          _onPressItemFromFinish(index);
+                        },
+                        toggleFinish: () {
+                          _openTask(index);
+                        }),
+                  )
+                : SizedBox(),
           ],
         ),
       ),
@@ -78,23 +95,42 @@ class _ListOfTasksState extends State<ListOfTasks> {
   }
 
   Widget _buildFinishedTasksHeadline() {
-    return Padding(
-      padding: EdgeInsets.only(left: kDefaultPadding, top: kDefaultPadding / 5, bottom: kDefaultPadding / 5, right: kDefaultPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: EdgeInsets.only(left: kDefaultPadding, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
-            decoration: BoxDecoration(
-              color: kPrimaryColor.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: InkWell(
+    return InkWell(
+      onTap: () {
+        setState(() {
+          {
+            setState(() {
+              if (_hideFinishTasks) {
+                _animationController..reverse(from: 0.5);
+              } else {
+                _animationController..forward(from: 0.0);
+              }
+              _hideFinishTasks = !_hideFinishTasks;
+            });
+          }
+        });
+      },
+      child: Padding(
+        padding: EdgeInsets.only(left: kDefaultPadding, top: kDefaultPadding / 5, bottom: kDefaultPadding / 5, right: kDefaultPadding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: kDefaultPadding-5, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
+              decoration: BoxDecoration(
+                color: kPrimaryColor.withOpacity(0.80),
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.arrow_circle_down_sharp, size: 18, color: Colors.white,),
-                  SizedBox(width: 8,),
+                  RotationTransition(
+                    turns: Tween(begin: 0.0, end: 1.0).animate(_animationController),
+                    child: Icon(Icons.expand_more, color: Colors.white),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
                   Text.rich(
                     TextSpan(
                       text: 'Finished Tasks ' + widget.finishedTasks.length.toString(),
@@ -108,8 +144,8 @@ class _ListOfTasksState extends State<ListOfTasks> {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
