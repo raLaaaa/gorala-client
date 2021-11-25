@@ -74,7 +74,6 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
                       ),
                     ),
                   ),
-                  Text(widget.task.isFinished.toString())
                 ],
               ),
             ),
