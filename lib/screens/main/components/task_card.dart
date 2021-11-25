@@ -45,7 +45,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
       child: Container(
         padding: EdgeInsets.only(left: kDefaultPadding, right: kDefaultPadding, top: kDefaultPadding),
         decoration: BoxDecoration(
-          color: widget.task.isFinished ? kPrimaryColor.withOpacity(0.6) : kPrimaryColor,
+          color: kPrimaryColor,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
@@ -62,7 +62,9 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: widget.task.isFinished ? Colors.white60 : Colors.white,
+                          color: Colors.white,
+                          decoration: widget.task.isFinished ? TextDecoration.lineThrough : TextDecoration.none,
+                          decorationThickness: 1.25
                         ),
                       ),
                     ),
