@@ -56,8 +56,8 @@ class _ListOfTasksState extends State<ListOfTasks> {
                     _finishTask(index);
                   }),
             ),
-            Divider(),
-            Text('FINISHED'),
+            widget.finishedTasks.isNotEmpty ? Divider() : SizedBox(),
+            widget.finishedTasks.isNotEmpty ? SizedBox(child: _buildFinishedTasksHeadline()) : SizedBox(),
             ListView.builder(
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
@@ -73,6 +73,43 @@ class _ListOfTasksState extends State<ListOfTasks> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFinishedTasksHeadline() {
+    return Padding(
+      padding: EdgeInsets.only(left: kDefaultPadding, top: kDefaultPadding / 5, bottom: kDefaultPadding / 5, right: kDefaultPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: kDefaultPadding, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
+            decoration: BoxDecoration(
+              color: kPrimaryColor.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: InkWell(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(Icons.arrow_circle_down_sharp, size: 18, color: Colors.white,),
+                  SizedBox(width: 8,),
+                  Text.rich(
+                    TextSpan(
+                      text: 'Finished Tasks ' + widget.finishedTasks.length.toString(),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
