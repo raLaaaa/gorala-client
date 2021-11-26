@@ -22,16 +22,29 @@ class ListOfTasks extends StatefulWidget {
   _ListOfTasksState createState() => _ListOfTasksState();
 }
 
-class _ListOfTasksState extends State<ListOfTasks> with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
+class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin{
+  AnimationController _expandAnimationController;
   bool _hideFinishTasks = false;
+
+  AnimationController _fadeAnimationController;
+  Animation<double> _fadeAnimation;
 
   @override
   void initState() {
-    _animationController = AnimationController(
+    _expandAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
       upperBound: 0.5,
+    );
+
+    _fadeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 750),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeAnimationController,
+      curve: Curves.easeOut,
     );
 
     super.initState();
@@ -39,8 +52,10 @@ class _ListOfTasksState extends State<ListOfTasks> with SingleTickerProviderStat
 
   @override
   void dispose() {
+    _expandAnimationController.dispose();
+    _fadeAnimationController.dispose();
+
     super.dispose();
-    _animationController.dispose();
   }
 
   @override
@@ -95,56 +110,61 @@ class _ListOfTasksState extends State<ListOfTasks> with SingleTickerProviderStat
   }
 
   Widget _buildFinishedTasksHeadline() {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          {
-            setState(() {
-              if (_hideFinishTasks) {
-                _animationController..reverse(from: 0.5);
-              } else {
-                _animationController..forward(from: 0.0);
-              }
-              _hideFinishTasks = !_hideFinishTasks;
-            });
-          }
-        });
-      },
-      child: Padding(
-        padding: EdgeInsets.only(left: kDefaultPadding, top: kDefaultPadding / 5, bottom: kDefaultPadding / 5, right: kDefaultPadding),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              padding: EdgeInsets.only(left: kDefaultPadding-5, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
-              decoration: BoxDecoration(
-                color: kPrimaryColor.withOpacity(0.80),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RotationTransition(
-                    turns: Tween(begin: 0.0, end: 1.0).animate(_animationController),
-                    child: Icon(Icons.expand_more, color: Colors.white),
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      text: 'Finished Tasks ' + widget.finishedTasks.length.toString(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+    _fadeAnimationController.forward();
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            {
+              setState(() {
+                if (_hideFinishTasks) {
+                  _expandAnimationController..reverse(from: 0.5);
+                } else {
+                  _expandAnimationController..forward(from: 0.0);
+                }
+                _hideFinishTasks = !_hideFinishTasks;
+              });
+            }
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.only(left: kDefaultPadding, top: kDefaultPadding / 5, bottom: kDefaultPadding / 5, right: kDefaultPadding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: kDefaultPadding-5, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
+                decoration: BoxDecoration(
+                  color: kPrimaryColor.withOpacity(0.80),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RotationTransition(
+                      turns: Tween(begin: 2.0, end: 1.5).animate(_expandAnimationController),
+                      child: Icon(Icons.expand_more, color: Colors.white),
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        text: 'Finished Tasks ' + widget.finishedTasks.length.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -54,6 +54,7 @@ class _MainScreenState extends State<MainScreen> {
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.getAllTasksOfUserByDateWithRange(_currentSelectedDate);
+
     _loadedRanges.add(_initialPage);
     _currentIndex = _initialPage;
 
@@ -156,7 +157,6 @@ class _MainScreenState extends State<MainScreen> {
                       openTasksForThisDay = allTasksForThisDay.where((task) => !task.isFinished).toList();
                       finishedTasksForThisDay = allTasksForThisDay.where((task) => task.isFinished).toList();
                     }
-
 
                     return Stack(
                       children: [
@@ -313,7 +313,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildEntryForPageController(List<Task> openTasks, List<Task> finishedTasks) {
-    if (openTasks.isEmpty) {
+    if (openTasks.isEmpty && finishedTasks.isEmpty) {
       return Container(child: _buildIfTasksEmpty());
     }
 
