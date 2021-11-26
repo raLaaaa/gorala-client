@@ -16,11 +16,11 @@ class EditTaskArguments {
 }
 
 class EditTaskView extends StatefulWidget {
-  final Task task;
+  final EditTaskArguments args;
 
   const EditTaskView({
     Key key,
-    this.task,
+    this.args,
   }) : super(key: key);
 
   @override
@@ -33,20 +33,14 @@ class _EditTaskViewState extends State<EditTaskView> {
   DateTime _initialDate = DateTime.now();
   DateTime _selectedDate;
   String _taskDescription;
+  bool _isCarryOnTask;
   String _errorMessage;
   Task _taskToEdit;
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context).settings.arguments as EditTaskArguments;
-
-    if(args != null) {
-      _taskToEdit = args.task;
-      _initialDate = _taskToEdit.executionDate;
-      _taskDescription = _taskToEdit.description;
-    }
-    else{
-      return Text('404 - Invalid Data');
+    if(_taskToEdit == null){
+      return _buildNotFoundScaffold();
     }
 
     return Scaffold(
@@ -75,6 +69,11 @@ class _EditTaskViewState extends State<EditTaskView> {
 
   @override
   void initState() {
+    _taskToEdit = widget.args.task;
+    _initialDate = _taskToEdit.executionDate;
+    _taskDescription = _taskToEdit.description;
+    _isCarryOnTask = _taskToEdit.isCarryOnTask;
+
     super.initState();
   }
 
@@ -89,11 +88,11 @@ class _EditTaskViewState extends State<EditTaskView> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _selectTaskDate(context),
                   Divider(),
                   _buildTaskDescription(context),
+                  _createCarryOnCheck(context),
                   _editTaskButton(context),
                 ],
               ),
@@ -101,6 +100,15 @@ class _EditTaskViewState extends State<EditTaskView> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNotFoundScaffold(){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Not found', style: TextStyle(fontSize: 28)),
+      ),
+      body: Text('404 - Did not find what you are looking for'),
     );
   }
 
@@ -158,6 +166,43 @@ class _EditTaskViewState extends State<EditTaskView> {
     );
   }
 
+  Widget _createCarryOnCheck(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Carry on task',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                'The task will be shown each day\nuntil it is finished',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 18,
+            height: 24,
+            child: Checkbox(
+              value: _isCarryOnTask,
+              onChanged: (bool value) {
+                setState(() {
+                  _isCarryOnTask = value;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _editTaskButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
@@ -210,7 +255,7 @@ class _EditTaskViewState extends State<EditTaskView> {
   void submitEditTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
       DateTime date = _selectedDate ?? _initialDate;
-      Task editedTask = Task(_taskToEdit.id, _taskDescription, _taskToEdit.isFinished, date);
+      Task editedTask = Task(_taskToEdit.id, _taskDescription, _taskToEdit.isFinished, _isCarryOnTask, date, _taskToEdit.createdAt);
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.editTask(editedTask);

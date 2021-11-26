@@ -37,21 +37,39 @@ class MyApp extends StatelessWidget {
           ),
         ),
         title: 'gorala',
+        onGenerateRoute: generateRoute,
         initialRoute: '/',
-        routes: {
-          '/': (context) => _buildEntryScreen(),
-          '/success': (context) => SuccessfulRegistrationView(),
-          '/successreset': (context) => SuccessfulResetView(),
-          '/register': (context) => _buildRegisterScreen(),
-          '/resetpassword': (context) => _buildForogtPasswordScreen(),
-          '/add': (context) => _buildCreateTaskScreen(),
-          '/edit': (context) => _buildEditTaskScreen(),
-        },
       ),
     );
   }
 
-  Widget _buildEntryScreen() {
+  Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) =>  _buildEntryScreen(settings.arguments),);
+      case '/success':
+        return MaterialPageRoute(builder: (_) => SuccessfulRegistrationView(),);
+      case '/successreset':
+        return MaterialPageRoute(builder: (_) => SuccessfulResetView(),);
+      case '/register':
+        return MaterialPageRoute(builder: (_) => _buildRegisterScreen(settings.arguments),);
+      case '/resetpassword':
+        return MaterialPageRoute(builder: (_) => _buildForogtPasswordScreen(settings.arguments),);
+      case '/add':
+        return MaterialPageRoute(builder: (_) => _buildCreateTaskScreen(settings.arguments),);
+      case '/edit':
+        return MaterialPageRoute(builder: (_) => _buildEditTaskScreen(settings.arguments),);
+
+      default:
+        return MaterialPageRoute(
+            builder: (_) => Scaffold(
+              body: Center(
+                  child: Text('No route defined for ${settings.name}')),
+            ));
+    }
+  }
+
+  Widget _buildEntryScreen(args) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is Foreign) {
@@ -61,7 +79,7 @@ class MyApp extends StatelessWidget {
         } else if (state is AuthError) {
           return LoginView(errorMessage: state.message, userName: state.username);
         } else if (state is Authenticated) {
-          return MainScreen();
+          return MainScreen(args: args);
         } else {
           return LoginView(errorMessage: "Weird things are happening..");
         }
@@ -69,7 +87,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildCreateTaskScreen() {
+  Widget _buildCreateTaskScreen(args) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is Foreign) {
@@ -79,7 +97,7 @@ class MyApp extends StatelessWidget {
         } else if (state is AuthError) {
           return LoginView(errorMessage: state.message, userName: state.username);
         } else if (state is Authenticated) {
-          return CreateTaskView();
+          return CreateTaskView(args: args);
         } else {
           return LoginView(errorMessage: "Weird things are happening..");
         }
@@ -87,13 +105,13 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildForogtPasswordScreen() {
+  Widget _buildForogtPasswordScreen(args) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is Foreign) {
           return ForgotPasswordView();
         } else if (state is Authenticated) {
-          return _buildEntryScreen();
+          return _buildEntryScreen(args);
         } else if (state is AuthLoading) {
           return LoadingView();
         } else if (state is AuthError) {
@@ -105,13 +123,13 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildRegisterScreen() {
+  Widget _buildRegisterScreen(args) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is Foreign) {
           return RegistrationView();
         } else if (state is Authenticated) {
-          return _buildEntryScreen();
+          return _buildEntryScreen(args);
         } else if (state is AuthLoading) {
           return LoadingView();
         } else if (state is AuthError) {
@@ -123,7 +141,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildEditTaskScreen() {
+  Widget _buildEditTaskScreen(args) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is Foreign) {
@@ -133,7 +151,7 @@ class MyApp extends StatelessWidget {
         } else if (state is AuthError) {
           return LoginView(errorMessage: state.message, userName: state.username);
         } else if (state is Authenticated) {
-          return EditTaskView();
+          return EditTaskView(args: args);
         } else {
           return LoginView(errorMessage: "Weird things are happening..");
         }

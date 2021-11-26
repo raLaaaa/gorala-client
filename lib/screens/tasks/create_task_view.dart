@@ -17,9 +17,11 @@ class CreateTaskArguments {
 
 class CreateTaskView extends StatefulWidget {
   final String errorMessage;
+  final CreateTaskArguments args;
 
   const CreateTaskView({
     Key key,
+    this.args,
     this.errorMessage,
   }) : super(key: key);
 
@@ -33,20 +35,10 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   DateTime _initialDate = DateTime.now();
   DateTime _selectedDate;
   String _taskDescription = '';
+  bool _isCarryOn = false;
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context).settings.arguments as CreateTaskArguments;
-
-    if(args != null) {
-      _initialDate = args.initialDate;
-    }
-    else{
-      _initialDate = DateTime.now();
-    }
-
-
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Create a new task', style: TextStyle(fontSize: 28)),
@@ -58,6 +50,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   void initState() {
     super.initState();
+    _initialDate = widget.args.initialDate;
+
   }
 
   Widget _CreateTaskForm(BuildContext context) {
@@ -71,12 +65,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _selectTaskDate(context),
                   Divider(),
                   _buildTaskDescription(context),
-                  _CreateTaskButton(context),
+                  _createCarryOnCheck(context),
+                  _createTaskButton(context)
                 ],
               ),
             ),
@@ -122,7 +116,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
           return 'Please enter some text';
         }
 
-        if(value.length >= 9000){
+        if (value.length >= 9000) {
           return 'A lot to do, huh? Maybe a little less would help..';
         }
 
@@ -138,9 +132,46 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     );
   }
 
-  Widget _CreateTaskButton(BuildContext context) {
+  Widget _createCarryOnCheck(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: 18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Carry on task',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                'The task will be shown each day\nuntil it is finished',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 18,
+            height: 24,
+            child: Checkbox(
+              value: _isCarryOn,
+              onChanged: (bool value) {
+                setState(() {
+                  _isCarryOn = value;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _createTaskButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
       child: Column(
         children: [
           widget.errorMessage != null
@@ -191,7 +222,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     if (_formKey.currentState.validate()) {
       DateTime date = _selectedDate ?? _initialDate;
 
-      Task toCreate = Task("", _taskDescription, false, date);
+      Task toCreate = Task("", _taskDescription, false, _isCarryOn, date, DateTime.now());
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.createTask(toCreate);

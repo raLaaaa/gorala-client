@@ -19,8 +19,11 @@ class MainScreenArguments {
 }
 
 class MainScreen extends StatefulWidget {
+  final MainScreenArguments args;
+
   const MainScreen({
     Key key,
+    this.args,
   }) : super(key: key);
 
   @override
@@ -260,7 +263,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _checkIfAutoNavigate(context) {
-    var args = ModalRoute.of(context).settings.arguments as MainScreenArguments;
+    var args = widget.args;
     if (args != null && args.initalDate != null && !_hasBeenNavigatedByArgs) {
       DateTime nowFull = DateTime.now().toUtc();
       DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);

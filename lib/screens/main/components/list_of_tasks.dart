@@ -188,7 +188,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
 
   void _finishTask(index) {
     var localTask = widget.openTasks[index];
-    Task editedTask = Task(localTask.id, localTask.description, true, localTask.executionDate);
+    Task editedTask = Task(localTask.id, localTask.description, true, localTask.isCarryOnTask, localTask.executionDate, localTask.createdAt);
 
     setState(() {
       widget.finishedTasks.add(editedTask);
@@ -201,7 +201,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
 
   void _openTask(index) {
     var localTask = widget.finishedTasks[index];
-    Task editedTask = Task(localTask.id, localTask.description, false, localTask.executionDate);
+    Task editedTask = Task(localTask.id, localTask.description, false, localTask.isCarryOnTask, localTask.executionDate, localTask.createdAt);
 
     setState(() {
       widget.openTasks.add(editedTask);

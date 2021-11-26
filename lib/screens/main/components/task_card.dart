@@ -94,6 +94,7 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
+                      Text(widget.task.isCarryOnTask.toString())
                     ],
                   ),
                 ),

@@ -5,7 +5,6 @@ import 'package:gorala/services/api/api_client.dart';
 import 'package:intl/intl.dart';
 
 class TaskRepository {
-
   static final LAZY_LOADING_FETCH_RANGE = '10';
 
   Future<Map<DateTime, List<Task>>> fetchAllTasksOfUser() async {
@@ -34,9 +33,7 @@ class TaskRepository {
   Future<Map<DateTime, List<Task>>> fetchAllTasksOfUserByDateWithRange(DateTime time) async {
     var _dateFormat = DateFormat('dd-MM-yyyy');
 
-    dynamic response = await ApiClient.getRequest(
-        '/api/v1/tasks/' + _dateFormat.format(time) + '/' + LAZY_LOADING_FETCH_RANGE);
-
+    dynamic response = await ApiClient.getRequest('/api/v1/tasks/' + _dateFormat.format(time) + '/' + LAZY_LOADING_FETCH_RANGE);
 
     if (response.statusCode == 200) {
       var decodedBody = jsonDecode(response.body);
@@ -49,45 +46,43 @@ class TaskRepository {
   Future<Task> createTask(Task task) async {
     dynamic data = {
       "description": task.description,
+      "isCarryOnTask": task.isCarryOnTask,
       "executionDate": task.executionDate.toUtc().toIso8601String(),
     };
 
-    dynamic response = await ApiClient.postRequestAsJSON(
-        '/api/v1/tasks/add', jsonEncode(data));
+    dynamic response = await ApiClient.postRequestAsJSON('/api/v1/tasks/add', jsonEncode(data));
 
-    if(response.statusCode == 201) {
+    if (response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
 
-      Task task =Task(
+      Task task = Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
         decodedBody['IsFinished'],
+        decodedBody['IsCarryOnTask'],
         DateTime.parse(decodedBody['ExecutionDate']),
+        DateTime.parse(decodedBody['CreatedAt']),
       );
-
       return task;
     } else {
-    return null;
+      return null;
     }
   }
 
   Future<Task> editTask(Task task) async {
-    dynamic data = {
-      "description": task.description,
-      "executionDate": task.executionDate.toUtc().toIso8601String(),
-      "isFinished": task.isFinished
-    };
+    dynamic data = {"description": task.description, "executionDate": task.executionDate.toUtc().toIso8601String(), "isCarryOnTask": task.isCarryOnTask, "isFinished": task.isFinished};
 
-     dynamic response = await ApiClient.putRequest(
-        '/api/v1/tasks/edit/'+task.id, jsonEncode(data));
+    dynamic response = await ApiClient.putRequest('/api/v1/tasks/edit/' + task.id, jsonEncode(data));
 
-    if(response.statusCode == 201) {
+    if (response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
-      Task task =Task(
+      Task task = Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
         decodedBody['IsFinished'],
+        decodedBody['IsCarryOnTask'],
         DateTime.parse(decodedBody['ExecutionDate']),
+        DateTime.parse(decodedBody['CreatedAt']),
       );
 
       return task;
@@ -97,11 +92,9 @@ class TaskRepository {
   }
 
   Future<bool> deleteTask(Task task) async {
+    dynamic response = await ApiClient.deleteRequest('/api/v1/tasks/delete/' + task.id);
 
-    dynamic response = await ApiClient.deleteRequest(
-        '/api/v1/tasks/delete/'+task.id);
-
-    if(response.statusCode == 200) {
+    if (response.statusCode == 200) {
       return true;
     } else {
       return false;
@@ -125,7 +118,9 @@ class TaskRepository {
             entry['ID'].toString(),
             entry['Description'],
             entry['IsFinished'],
+            entry['IsCarryOnTask'],
             DateTime.parse(entry['ExecutionDate']),
+            DateTime.parse(entry['CreatedAt']),
           ),
         );
       } else {
@@ -134,13 +129,13 @@ class TaskRepository {
             entry['ID'].toString(),
             entry['Description'],
             entry['IsFinished'],
+            entry['IsCarryOnTask'],
             DateTime.parse(entry['ExecutionDate']),
+            DateTime.parse(entry['CreatedAt']),
           ),
         );
       }
     });
-
-
 
     return toReturn;
   }

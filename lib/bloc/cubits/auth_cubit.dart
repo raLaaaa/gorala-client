@@ -9,31 +9,38 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
+  static bool _checkedInitialAuth = false;
 
   AuthCubit(this._authRepository) : super(Foreign());
 
   Future<void> checkIfAuthenticated() async {
-    emit(AuthLoading());
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('AUTH_TOKEN') ?? '';
-    var id = prefs.getString('ID') ?? '';
-    var mail = prefs.getString('EMAIL') ?? '';
+    if(!_checkedInitialAuth) {
+      _checkedInitialAuth = true;
+      emit(AuthLoading());
 
-    if(token.isNotEmpty){
-      AuthRepository.AUTH_TOKEN = token;
-      final loggedIn = await _authRepository.checkLogin();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('AUTH_TOKEN') ?? '';
+      var id = prefs.getString('ID') ?? '';
+      var mail = prefs.getString('EMAIL') ?? '';
 
-      if(loggedIn){
-        emit(Authenticated(new User(id, mail, token)));
-        return;
-      }
-      else{
+      if (token.isNotEmpty) {
+        AuthRepository.AUTH_TOKEN = token;
+        final loggedIn = await _authRepository.checkLogin();
+
+        if (loggedIn) {
+          emit(Authenticated(new User(id, mail, token)));
+          return;
+        }
+        else {
+          emit(Foreign());
+          return;
+        }
+      } else {
         emit(Foreign());
-        return;
       }
-
-    } else {
+    }
+    else{
       emit(Foreign());
     }
 
