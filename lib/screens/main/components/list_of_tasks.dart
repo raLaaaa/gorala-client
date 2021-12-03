@@ -189,7 +189,10 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
 
   void _finishTask(index) {
     var localTask = widget.openTasks[index];
+    var isCarryOn = false;
     Task editedTask = Task(localTask.id, localTask.description, true, localTask.isCarryOnTask, localTask.executionDate, localTask.createdAt);
+
+    isCarryOn = localTask.isCarryOnTask;
 
     setState(() {
       if(editedTask.isCarryOnTask){
@@ -201,6 +204,20 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
       }
       widget.finishedTasks.add(editedTask);
     });
+
+
+    if(!isCarryOn) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Task finished"),
+        duration: Duration(seconds: 3),
+      ));
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Task finished.\nYou can find the original task on the " + editedTask.getExecutionDateFormatted()),
+        duration: Duration(seconds: 4),
+      ));
+    }
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.changeTaskStatusSeamless(editedTask);
@@ -218,6 +235,11 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
         TaskRepository.ALL_CACHED_CARRY_ON_TASKS.add(editedTask);
       }
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Task reopened"),
+      duration: Duration(seconds: 3),
+    ));
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
     taskCubit.changeTaskStatusSeamless(editedTask);

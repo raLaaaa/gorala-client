@@ -110,6 +110,10 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               _pageController.jumpToPage(_initialPage);
               _refreshTasks(context);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Jumped to todays date"),
+                duration: Duration(seconds: 4),
+              ));
             },
           ),
           kIsWeb

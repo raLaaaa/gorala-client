@@ -30,12 +30,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primaryColor: kTitleTextColor,
-          accentColor: kTitleTextColor,
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
-          ),
-        ),
+            primaryColor: kTitleTextColor,
+            accentColor: kTitleTextColor,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
+            ),
+            snackBarTheme: SnackBarThemeData(backgroundColor: kTitleTextColor)),
         title: 'gorala',
         onGenerateRoute: generateRoute,
         initialRoute: '/',
@@ -46,26 +46,39 @@ class MyApp extends StatelessWidget {
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) =>  _buildEntryScreen(settings.arguments),);
+        return MaterialPageRoute(
+          builder: (_) => _buildEntryScreen(settings.arguments),
+        );
       case '/success':
-        return MaterialPageRoute(builder: (_) => SuccessfulRegistrationView(),);
+        return MaterialPageRoute(
+          builder: (_) => SuccessfulRegistrationView(),
+        );
       case '/successreset':
-        return MaterialPageRoute(builder: (_) => SuccessfulResetView(),);
+        return MaterialPageRoute(
+          builder: (_) => SuccessfulResetView(),
+        );
       case '/register':
-        return MaterialPageRoute(builder: (_) => _buildRegisterScreen(settings.arguments),);
+        return MaterialPageRoute(
+          builder: (_) => _buildRegisterScreen(settings.arguments),
+        );
       case '/resetpassword':
-        return MaterialPageRoute(builder: (_) => _buildForogtPasswordScreen(settings.arguments),);
+        return MaterialPageRoute(
+          builder: (_) => _buildForogtPasswordScreen(settings.arguments),
+        );
       case '/add':
-        return MaterialPageRoute(builder: (_) => _buildCreateTaskScreen(settings.arguments),);
+        return MaterialPageRoute(
+          builder: (_) => _buildCreateTaskScreen(settings.arguments),
+        );
       case '/edit':
-        return MaterialPageRoute(builder: (_) => _buildEditTaskScreen(settings.arguments),);
+        return MaterialPageRoute(
+          builder: (_) => _buildEditTaskScreen(settings.arguments),
+        );
 
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(
-              body: Center(
-                  child: Text('No route defined for ${settings.name}')),
-            ));
+                  body: Center(child: Text('No route defined for ${settings.name}')),
+                ));
     }
   }
 

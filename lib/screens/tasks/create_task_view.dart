@@ -147,7 +147,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                'The task will be shown each day\nuntil it is finished',
+                'The task will be shown each day\nafter it\'s creation date until it is\nfinished',
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ],
