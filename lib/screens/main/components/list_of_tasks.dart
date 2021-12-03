@@ -23,7 +23,7 @@ class ListOfTasks extends StatefulWidget {
   _ListOfTasksState createState() => _ListOfTasksState();
 }
 
-class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin{
+class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin {
   AnimationController _expandAnimationController;
   bool _hideFinishTasks = false;
 
@@ -136,7 +136,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.only(left: kDefaultPadding-5, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
+                padding: EdgeInsets.only(left: kDefaultPadding - 5, right: kDefaultPadding, top: kDefaultPadding - 7, bottom: kDefaultPadding - 7),
                 decoration: BoxDecoration(
                   color: kPrimaryColor.withOpacity(0.80),
                   borderRadius: BorderRadius.circular(15),
@@ -195,26 +195,24 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
     isCarryOn = localTask.isCarryOnTask;
 
     setState(() {
-      if(editedTask.isCarryOnTask){
+      if (editedTask.isCarryOnTask) {
         TaskRepository.ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => element.id == editedTask.id);
         widget.openTasks.removeWhere((element) => element.id == editedTask.id);
-      }
-      else{
+      } else {
         widget.openTasks.removeAt(index);
       }
       widget.finishedTasks.add(editedTask);
     });
 
-
-    if(!isCarryOn) {
+    if (!isCarryOn) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Task finished"),
         duration: Duration(seconds: 3),
       ));
-    }
-    else{
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Task finished.\nYou can find the original task on the " + editedTask.getExecutionDateFormatted()),
+        content:
+            InkWell(onTap: () {}, child: Text("Task finished.\nYou can find the original task on the " + editedTask.getExecutionDateFormatted())),
         duration: Duration(seconds: 4),
       ));
     }
@@ -231,7 +229,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
       widget.openTasks.add(editedTask);
       widget.finishedTasks.removeAt(index);
 
-      if(editedTask.isCarryOnTask){
+      if (editedTask.isCarryOnTask) {
         TaskRepository.ALL_CACHED_CARRY_ON_TASKS.add(editedTask);
       }
     });

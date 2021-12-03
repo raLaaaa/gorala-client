@@ -80,7 +80,7 @@ class TaskRepository {
       if (task.isCarryOnTask) {
         ALL_CACHED_CARRY_ON_TASKS.add(task);
       } else {
-        ALL_CACHED_CARRY_ON_TASKS.remove(task);
+        ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => task.id == element.id);
       }
 
       return task;
@@ -111,9 +111,11 @@ class TaskRepository {
       );
 
       if (task.isCarryOnTask) {
+        ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => task.id == element.id);
         ALL_CACHED_CARRY_ON_TASKS.add(task);
+
       } else {
-        ALL_CACHED_CARRY_ON_TASKS.remove(task);
+        ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => task.id == element.id);
       }
 
       return task;
@@ -124,7 +126,7 @@ class TaskRepository {
 
   Future<bool> deleteTask(Task task) async {
     dynamic response = await ApiClient.deleteRequest('/api/v1/tasks/delete/' + task.id);
-    ALL_CACHED_CARRY_ON_TASKS.remove(task);
+    ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => task.id == element.id);
     if (response.statusCode == 200) {
       return true;
     } else {
