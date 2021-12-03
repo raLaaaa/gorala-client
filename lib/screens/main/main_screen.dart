@@ -166,7 +166,7 @@ class _MainScreenState extends State<MainScreen> {
 
                     TaskRepository.ALL_CACHED_CARRY_ON_TASKS.forEach((task) {
                       Task contains = openTasksForThisDay.firstWhereOrNull((element) => element.id == task.id);
-                      if (contains == null && (task.executionDate.isAtSameMomentAs(dateToFetch) || dateToFetch.isAfter(task.executionDate))) {
+                      if (contains == null && !task.isFinished && (task.executionDate.isAtSameMomentAs(dateToFetch) || dateToFetch.isAfter(task.executionDate))) {
                         openTasksForThisDay.add(task);
                       }
                     });

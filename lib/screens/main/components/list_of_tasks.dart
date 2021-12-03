@@ -192,13 +192,14 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
     Task editedTask = Task(localTask.id, localTask.description, true, localTask.isCarryOnTask, localTask.executionDate, localTask.createdAt);
 
     setState(() {
-      widget.finishedTasks.add(editedTask);
-      widget.openTasks.removeAt(index);
-
       if(editedTask.isCarryOnTask){
-        TaskRepository.ALL_CACHED_CARRY_ON_TASKS.remove(editedTask);
+        TaskRepository.ALL_CACHED_CARRY_ON_TASKS.removeWhere((element) => element.id == editedTask.id);
         widget.openTasks.removeWhere((element) => element.id == editedTask.id);
       }
+      else{
+        widget.openTasks.removeAt(index);
+      }
+      widget.finishedTasks.add(editedTask);
     });
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
