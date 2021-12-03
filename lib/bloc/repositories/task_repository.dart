@@ -6,13 +6,18 @@ import 'package:intl/intl.dart';
 
 class TaskRepository {
   static final LAZY_LOADING_FETCH_RANGE = '10';
+  static final ALL_CACHED_CARRY_ON_TASKS = Set<Task>();
 
   Future<Map<DateTime, List<Task>>> fetchAllTasksOfUser() async {
     dynamic response = await ApiClient.getRequest('/api/v1/tasks');
 
     if (response.statusCode == 200) {
       var decodedBody = jsonDecode(response.body);
-      return _convertResponseToMap(decodedBody);
+      var defaultMap = _convertResponseToMap(decodedBody);
+
+      _checkCarryOnTasks(defaultMap);
+
+      return defaultMap;
     } else {
       return null;
     }
@@ -24,7 +29,11 @@ class TaskRepository {
 
     if (response.statusCode == 200) {
       var decodedBody = jsonDecode(response.body);
-      return _convertResponseToMap(decodedBody);
+      var defaultMap = _convertResponseToMap(decodedBody);
+
+      _checkCarryOnTasks(defaultMap);
+
+      return defaultMap;
     } else {
       return null;
     }
@@ -37,7 +46,11 @@ class TaskRepository {
 
     if (response.statusCode == 200) {
       var decodedBody = jsonDecode(response.body);
-      return _convertResponseToMap(decodedBody);
+      var defaultMap = _convertResponseToMap(decodedBody);
+
+      _checkCarryOnTasks(defaultMap);
+
+      return defaultMap;
     } else {
       return null;
     }
@@ -63,6 +76,13 @@ class TaskRepository {
         DateTime.parse(decodedBody['ExecutionDate']),
         DateTime.parse(decodedBody['CreatedAt']),
       );
+
+      if (task.isCarryOnTask) {
+        ALL_CACHED_CARRY_ON_TASKS.add(task);
+      } else {
+        ALL_CACHED_CARRY_ON_TASKS.remove(task);
+      }
+
       return task;
     } else {
       return null;
@@ -70,7 +90,12 @@ class TaskRepository {
   }
 
   Future<Task> editTask(Task task) async {
-    dynamic data = {"description": task.description, "executionDate": task.executionDate.toUtc().toIso8601String(), "isCarryOnTask": task.isCarryOnTask, "isFinished": task.isFinished};
+    dynamic data = {
+      "description": task.description,
+      "executionDate": task.executionDate.toUtc().toIso8601String(),
+      "isCarryOnTask": task.isCarryOnTask,
+      "isFinished": task.isFinished
+    };
 
     dynamic response = await ApiClient.putRequest('/api/v1/tasks/edit/' + task.id, jsonEncode(data));
 
@@ -85,6 +110,12 @@ class TaskRepository {
         DateTime.parse(decodedBody['CreatedAt']),
       );
 
+      if (task.isCarryOnTask) {
+        ALL_CACHED_CARRY_ON_TASKS.add(task);
+      } else {
+        ALL_CACHED_CARRY_ON_TASKS.remove(task);
+      }
+
       return task;
     } else {
       return null;
@@ -93,7 +124,7 @@ class TaskRepository {
 
   Future<bool> deleteTask(Task task) async {
     dynamic response = await ApiClient.deleteRequest('/api/v1/tasks/delete/' + task.id);
-
+    ALL_CACHED_CARRY_ON_TASKS.remove(task);
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -105,7 +136,7 @@ class TaskRepository {
     Map<DateTime, List<Task>> toReturn = Map();
 
     if (decodedBody.length == 0) {
-      return null;
+      return toReturn;
     }
 
     decodedBody.forEach((entry) {
@@ -138,5 +169,17 @@ class TaskRepository {
     });
 
     return toReturn;
+  }
+
+  void _checkCarryOnTasks(
+    Map<DateTime, List<Task>> defaultMap,
+  ) {
+    defaultMap.forEach((date, tasks) {
+      tasks.forEach((task) {
+        if (task.isCarryOnTask && !task.isFinished) {
+          ALL_CACHED_CARRY_ON_TASKS.add(task);
+        }
+      });
+    });
   }
 }

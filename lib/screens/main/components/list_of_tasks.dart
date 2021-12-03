@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/task_cubit.dart';
+import 'package:gorala/bloc/repositories/task_repository.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/screens/tasks/edit_task_view.dart';
 
@@ -193,6 +194,11 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
     setState(() {
       widget.finishedTasks.add(editedTask);
       widget.openTasks.removeAt(index);
+
+      if(editedTask.isCarryOnTask){
+        TaskRepository.ALL_CACHED_CARRY_ON_TASKS.remove(editedTask);
+        widget.openTasks.removeWhere((element) => element.id == editedTask.id);
+      }
     });
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
@@ -206,6 +212,10 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
     setState(() {
       widget.openTasks.add(editedTask);
       widget.finishedTasks.removeAt(index);
+
+      if(editedTask.isCarryOnTask){
+        TaskRepository.ALL_CACHED_CARRY_ON_TASKS.add(editedTask);
+      }
     });
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);

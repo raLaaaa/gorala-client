@@ -94,7 +94,8 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      Text(widget.task.isCarryOnTask.toString())
+                      widget.task.isCarryOnTask ? Tooltip(message: 'This is a carry on task from the ' + widget.task.getExecutionDateFormatted(),
+                      child: Icon(Icons.replay, color: Colors.white,)) : SizedBox()
                     ],
                   ),
                 ),

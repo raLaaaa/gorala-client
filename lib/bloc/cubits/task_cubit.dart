@@ -38,6 +38,7 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   Future<void> getAllTasksOfUserByDateWithRange(DateTime time) async {
+
     emit(TasksLoading());
     Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDateWithRange(time);
 
@@ -45,7 +46,6 @@ class TaskCubit extends Cubit<TaskState> {
       emit(TasksLoaded(_cachedEntries));
       return;
     }
-
     _cachedEntries.addAll(tasks);
 
     emit(TasksLoaded(_cachedEntries));
@@ -90,9 +90,9 @@ class TaskCubit extends Cubit<TaskState> {
     if (editedTask != null) {
       var index = -1;
 
-      for(int i = 0 ; i < _cachedEntries[editedTask.executionDate].length; i++ ) {
+      for (int i = 0; i < _cachedEntries[editedTask.executionDate].length; i++) {
         index = i;
-        if(_cachedEntries[editedTask.executionDate][i].id == editedTask.id){
+        if (_cachedEntries[editedTask.executionDate][i].id == editedTask.id) {
           break;
         }
       }
@@ -112,11 +112,11 @@ class TaskCubit extends Cubit<TaskState> {
     if (editedTask != null) {
       var index = -1;
 
-      for(int i = 0 ; i < _cachedEntries[editedTask.executionDate].length; i++ ) {
+      for (int i = 0; i < _cachedEntries[editedTask.executionDate].length; i++) {
         index = i;
-         if(_cachedEntries[editedTask.executionDate][i].id == editedTask.id){
-           break;
-         }
+        if (_cachedEntries[editedTask.executionDate][i].id == editedTask.id) {
+          break;
+        }
       }
 
       _cachedEntries[editedTask.executionDate][index] = editedTask;

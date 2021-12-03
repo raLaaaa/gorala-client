@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,6 +109,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.calendar_today),
             onPressed: () {
               _pageController.jumpToPage(_initialPage);
+              _refreshTasks(context);
             },
           ),
           kIsWeb
@@ -152,20 +154,28 @@ class _MainScreenState extends State<MainScreen> {
                     DateTime dateToFetch = DateTime.now();
                     dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
                     DateTime roundedDate = DateTime.utc(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
-                    var allTasksForThisDay = state.tasks[roundedDate];
-                    var openTasksForThisDay = [];
-                    var finishedTasksForThisDay = [];
 
-                    if(allTasksForThisDay != null) {
+                    var allTasksForThisDay = state.tasks[roundedDate];
+                    var openTasksForThisDay = <Task>[];
+                    var finishedTasksForThisDay = <Task>[];
+
+                    if (allTasksForThisDay != null) {
                       openTasksForThisDay = allTasksForThisDay.where((task) => !task.isFinished).toList();
                       finishedTasksForThisDay = allTasksForThisDay.where((task) => task.isFinished).toList();
                     }
+
+                    TaskRepository.ALL_CACHED_CARRY_ON_TASKS.forEach((task) {
+                      Task contains = openTasksForThisDay.firstWhereOrNull((element) => element.id == task.id);
+                      if (contains == null && (task.executionDate.isAtSameMomentAs(dateToFetch) || dateToFetch.isAfter(task.executionDate))) {
+                        openTasksForThisDay.add(task);
+                      }
+                    });
 
                     return Stack(
                       children: [
                         kIsWeb && _index == _currentIndex ? _buildLeftButtonForWeb() : SizedBox(),
                         kIsWeb && _index == _currentIndex ? _buildRightButtonForWeb() : SizedBox(),
-                        allTasksForThisDay != null ? _buildEntryForPageController(openTasksForThisDay, finishedTasksForThisDay) : _buildEntryForPageController([], [])
+                        _buildEntryForPageController(openTasksForThisDay, finishedTasksForThisDay)
                       ],
                     );
                   } else {
