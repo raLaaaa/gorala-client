@@ -135,8 +135,15 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Tooltip(
-                          message: _buildTooltipIterationString(),
+                        child: InkWell(
+                          onLongPress: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(_buildSnackbarIterationString()),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          },
                           child: Container(
                             height: 50,
                             width: 100,
@@ -180,7 +187,7 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
     return iteration <= 0 ? '' : iteration.toString();
   }
 
-  String _buildTooltipIterationString() {
+  String _buildSnackbarIterationString() {
     String times = _buildIterationString();
 
     if (identical(times, '')) {
