@@ -53,7 +53,10 @@ class _MainScreenState extends State<MainScreen> {
     _loadedRanges = Set();
     _pageController = PageController(initialPage: _initialPage);
     _dateFormat = DateFormat('dd.MM.yyyy');
-    _currentSelectedDate = DateTime.now();
+
+    DateTime nowFull = DateTime.now().toUtc();
+    DateTime now = DateTime.utc(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
+    _currentSelectedDate = now;
     _hasBeenNavigatedByArgs = false;
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);

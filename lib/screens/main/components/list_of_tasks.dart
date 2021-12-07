@@ -207,18 +207,21 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
       }
       widget.finishedTasks.add(editedTask);
     });
-
-    if (!isCarryOn) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Task finished"),
-        duration: Duration(seconds: 3),
-      ));
+    
+    if (!isCarryOn || editedTask.executionDate.isAtSameMomentAs(widget.currentlyViewedDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Task finished"),
+          duration: Duration(seconds: 3),
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content:
-            InkWell(onTap: () {}, child: Text("Task finished.\nYou can find the original task on the " + editedTask.getExecutionDateFormatted())),
-        duration: Duration(seconds: 4),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Task finished.\nYou can find the original task on the " + editedTask.getExecutionDateFormatted()),
+          duration: Duration(seconds: 4),
+        ),
+      );
     }
 
     final taskCubit = BlocProvider.of<TaskCubit>(context);
