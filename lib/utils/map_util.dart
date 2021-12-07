@@ -5,7 +5,7 @@ class MapUtil {
     if (value == null) return result..addAll(map2);
 
     map2.forEach((key, mapValue) {
-      result[key] = result.containsKey(key) ? value(result[key] as V, mapValue) : mapValue;
+      result[key] = result.containsKey(key) ? value(result[key], mapValue) : mapValue;
     });
     return result;
   }

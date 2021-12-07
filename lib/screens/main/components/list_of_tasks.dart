@@ -12,11 +12,13 @@ import 'task_card.dart';
 class ListOfTasks extends StatefulWidget {
   final List<Task> openTasks;
   final List<Task> finishedTasks;
+  final DateTime currentlyViewedDate;
 
   const ListOfTasks({
     Key key,
     @required this.openTasks,
     @required this.finishedTasks,
+    @required this.currentlyViewedDate,
   }) : super(key: key);
 
   @override
@@ -80,6 +82,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
               itemCount: widget.openTasks.length,
               itemBuilder: (context, index) => TaskCard(
                   task: widget.openTasks[index],
+                  currentlyViewedDate: widget.currentlyViewedDate,
                   press: () {
                     _onPressItemFromOpen(index);
                   },
@@ -95,6 +98,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
                     physics: BouncingScrollPhysics(),
                     itemCount: widget.finishedTasks.length,
                     itemBuilder: (context, index) => TaskCard(
+                        currentlyViewedDate: widget.currentlyViewedDate,
                         task: widget.finishedTasks[index],
                         press: () {
                           _onPressItemFromFinish(index);

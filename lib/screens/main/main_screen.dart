@@ -341,6 +341,7 @@ class _MainScreenState extends State<MainScreen> {
           mobile: ListOfTasks(
             openTasks: openTasks,
             finishedTasks: finishedTasks,
+            currentlyViewedDate: _currentSelectedDate,
           ),
           tablet: Row(
             children: [
@@ -349,6 +350,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: ListOfTasks(
                   openTasks: openTasks,
                   finishedTasks: finishedTasks,
+                  currentlyViewedDate: _currentSelectedDate,
                 ),
               ),
             ],
@@ -362,6 +364,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: ListOfTasks(
                     openTasks: openTasks,
                     finishedTasks: finishedTasks,
+                    currentlyViewedDate: _currentSelectedDate,
                   ),
                 ),
               ),

@@ -10,9 +10,11 @@ class TaskCard extends StatefulWidget {
     @required this.task,
     @required this.toggleFinish,
     @required this.press,
+    @required this.currentlyViewedDate,
   }) : super(key: key);
 
   final Task task;
+  final DateTime currentlyViewedDate;
   final VoidCallback press;
   final VoidCallback toggleFinish;
 
@@ -120,9 +122,9 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                             },
                             child: Container(
                                 child: AnimatedCheck(
-                                  progress: _animation,
-                                  size: 28,
-                                )),
+                              progress: _animation,
+                              size: 28,
+                            )),
                             style: ElevatedButton.styleFrom(
                               shape: CircleBorder(),
                               primary: Colors.white, // <-- Button color
@@ -133,17 +135,27 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Container(
-                          height: 50,
-                          width: 40,
-                          child: Row(
-                            children: [
-                              Text('9', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white)),
-                              Icon(
-                                Icons.replay,
-                                color: Colors.white,
-                              ),
-                            ],
+                        child: Tooltip(
+                          message: _buildTooltipIterationString(),
+                          child: Container(
+                            height: 50,
+                            width: 100,
+                            child: widget.task.isCarryOnTask
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(_buildIterationString().toString(),
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white)),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Icon(
+                                        Icons.replay,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  )
+                                : SizedBox(),
                           ),
                         ),
                       )
@@ -156,5 +168,33 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  String _buildIterationString() {
+    int iteration = widget.task.executionDate.difference(widget.currentlyViewedDate).inDays.abs();
+
+    if (iteration >= 10000) {
+      return '> 10000';
+    }
+
+    return iteration <= 0 ? '' : iteration.toString();
+  }
+
+  String _buildTooltipIterationString() {
+    String times = _buildIterationString();
+
+    if (identical(times, '')) {
+      return 'You created this task today';
+    }
+
+    if (identical(times, '> 10000')) {
+      return 'This task is open since a while..';
+    }
+
+    if (identical(times, '1')) {
+      return times + ' day left since creating this task';
+    } else {
+      return times + ' days left since creating this task';
+    }
   }
 }
