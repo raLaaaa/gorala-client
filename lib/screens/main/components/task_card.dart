@@ -94,8 +94,6 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      widget.task.isCarryOnTask ? Tooltip(message: 'This is a carry on task from the ' + widget.task.getExecutionDateFormatted(),
-                      child: Icon(Icons.replay, color: Colors.white,)) : SizedBox()
                     ],
                   ),
                 ),
@@ -103,32 +101,53 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                   color: Colors.white,
                 ),
                 Container(
+                  height: 50,
                   width: double.infinity,
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    width: 26,
-                    height: 26,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_animationController.isCompleted) {
-                          _animationController.reverse().whenComplete(() => {widget.toggleFinish(), _animationController.value = 1});
-                        } else if (_animationController.isDismissed) {
-                          _animationController.forward().whenComplete(() => {widget.toggleFinish(), _animationController.value = 0});
-                        }
-                      },
-                      child: Center(
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
                         child: Container(
-                            child: AnimatedCheck(
-                          progress: _animation,
-                          size: 28,
-                        )),
+                          width: 150,
+                          height: 26,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_animationController.isCompleted) {
+                                _animationController.reverse().whenComplete(() => {widget.toggleFinish(), _animationController.value = 1});
+                              } else if (_animationController.isDismissed) {
+                                _animationController.forward().whenComplete(() => {widget.toggleFinish(), _animationController.value = 0});
+                              }
+                            },
+                            child: Container(
+                                child: AnimatedCheck(
+                                  progress: _animation,
+                                  size: 28,
+                                )),
+                            style: ElevatedButton.styleFrom(
+                              shape: CircleBorder(),
+                              primary: Colors.white, // <-- Button color
+                              onPrimary: kTitleTextColor, // <-- Splash color
+                            ),
+                          ),
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        primary: Colors.white, // <-- Button color
-                        onPrimary: kTitleTextColor, // <-- Splash color
-                      ),
-                    ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          height: 50,
+                          width: 40,
+                          child: Row(
+                            children: [
+                              Text('9', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white)),
+                              Icon(
+                                Icons.replay,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 )
               ],
