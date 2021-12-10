@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gorala/animations/animated_check.dart';
 import 'package:gorala/models/task.dart';
@@ -135,36 +136,21 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onLongPress: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(_buildSnackbarIterationString()),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            height: 50,
-                            width: 100,
-                            child: widget.task.isCarryOnTask
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(_buildIterationString().toString(),
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white)),
-                                      SizedBox(
-                                        width: 3,
-                                      ),
-                                      Icon(
-                                        Icons.replay,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  )
-                                : SizedBox(),
-                          ),
-                        ),
+                        child: kIsWeb
+                            ? Tooltip(
+                                message: _buildSnackbarIterationString(),
+                                child: _buildTaskContainer(),
+                              )
+                            : InkWell(
+                                onLongPress: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(_buildSnackbarIterationString()),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                },
+                                child: _buildTaskContainer()),
                       )
                     ],
                   ),
@@ -174,6 +160,28 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTaskContainer() {
+    return Container(
+      height: 50,
+      width: 100,
+      child: widget.task.isCarryOnTask
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(_buildIterationString().toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white)),
+                SizedBox(
+                  width: 3,
+                ),
+                Icon(
+                  Icons.replay,
+                  color: Colors.white,
+                ),
+              ],
+            )
+          : SizedBox(),
     );
   }
 

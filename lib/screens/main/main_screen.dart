@@ -80,6 +80,7 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: FloatingActionButton(
         highlightElevation: 0,
         elevation: 0,
+        foregroundColor: Colors.white,
         tooltip: 'Create a new task',
         onPressed: () {
           Navigator.pushNamed(
@@ -102,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
           },
           child: Row(
             children: [
-              Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28)),
+              Expanded(child: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28))),
             ],
           ),
         ),

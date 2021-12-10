@@ -207,7 +207,7 @@ class _ListOfTasksState extends State<ListOfTasks> with TickerProviderStateMixin
       }
       widget.finishedTasks.add(editedTask);
     });
-    
+
     if (!isCarryOn || editedTask.executionDate.isAtSameMomentAs(widget.currentlyViewedDate)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

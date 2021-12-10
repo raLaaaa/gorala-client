@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             primaryColor: kTitleTextColor,
             accentColor: kTitleTextColor,
+            colorScheme: ColorScheme.light().copyWith(primary:  kTitleTextColor),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
             ),
