@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
               style: TextButton.styleFrom(backgroundColor: kTitleTextColor),
             ),
             snackBarTheme: SnackBarThemeData(backgroundColor: kTitleTextColor)),
-        title: 'gorala',
+        title: 'gorala - app',
         onGenerateRoute: generateRoute,
         initialRoute: '/',
       ),
