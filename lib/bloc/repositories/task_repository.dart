@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:gorala/models/task.dart';
 import 'package:gorala/services/api/api_client.dart';
+import 'package:gorala/utils/time_util.dart';
 import 'package:intl/intl.dart';
 
 class TaskRepository {
@@ -60,22 +61,24 @@ class TaskRepository {
     dynamic data = {
       "description": task.description,
       "isCarryOnTask": task.isCarryOnTask,
-      "executionDate": task.executionDate.toUtc().toIso8601String(),
+      "executionDate": task.executionDate.toLocal().toIso8601String()+"Z",
     };
 
     dynamic response = await ApiClient.postRequestAsJSON('/api/v1/tasks/add', jsonEncode(data));
 
     if (response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
+      DateTime convertedExecutionTime = TimeUtil.convertToLocalWithoutTime(DateTime.parse(decodedBody['ExecutionDate']));
 
       Task task = Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
         decodedBody['IsFinished'],
         decodedBody['IsCarryOnTask'],
-        DateTime.parse(decodedBody['ExecutionDate']),
+        convertedExecutionTime,
         DateTime.parse(decodedBody['CreatedAt']),
       );
+
 
       if (task.isCarryOnTask) {
         ALL_CACHED_CARRY_ON_TASKS.add(task);
@@ -92,7 +95,7 @@ class TaskRepository {
   Future<Task> editTask(Task task) async {
     dynamic data = {
       "description": task.description,
-      "executionDate": task.executionDate.toUtc().toIso8601String(),
+      "executionDate": task.executionDate.toLocal().toIso8601String()+"Z",
       "isCarryOnTask": task.isCarryOnTask,
       "isFinished": task.isFinished
     };
@@ -101,12 +104,14 @@ class TaskRepository {
 
     if (response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
+      DateTime convertedExecutionTime = TimeUtil.convertToLocalWithoutTime(DateTime.parse(decodedBody['ExecutionDate']));
+
       Task task = Task(
         decodedBody['ID'].toString(),
         decodedBody['Description'],
         decodedBody['IsFinished'],
         decodedBody['IsCarryOnTask'],
-        DateTime.parse(decodedBody['ExecutionDate']),
+        convertedExecutionTime,
         DateTime.parse(decodedBody['CreatedAt']),
       );
 
@@ -142,28 +147,29 @@ class TaskRepository {
     }
 
     decodedBody.forEach((entry) {
-      List<Task> list = toReturn[DateTime.parse(entry['ExecutionDate'])];
+      DateTime convertedExecutionTime = TimeUtil.convertToLocalWithoutTime(DateTime.parse(entry['ExecutionDate']));
+      List<Task> list = toReturn[convertedExecutionTime];
 
       if (list == null) {
-        toReturn[DateTime.parse(entry['ExecutionDate'])] = [];
-        toReturn[DateTime.parse(entry['ExecutionDate'])].add(
+        toReturn[convertedExecutionTime] = [];
+        toReturn[convertedExecutionTime].add(
           Task(
             entry['ID'].toString(),
             entry['Description'],
             entry['IsFinished'],
             entry['IsCarryOnTask'],
-            DateTime.parse(entry['ExecutionDate']),
+            convertedExecutionTime,
             DateTime.parse(entry['CreatedAt']),
           ),
         );
       } else {
-        toReturn[DateTime.parse(entry['ExecutionDate'])].add(
+        toReturn[convertedExecutionTime].add(
           Task(
             entry['ID'].toString(),
             entry['Description'],
             entry['IsFinished'],
             entry['IsCarryOnTask'],
-            DateTime.parse(entry['ExecutionDate']),
+            convertedExecutionTime,
             DateTime.parse(entry['CreatedAt']),
           ),
         );

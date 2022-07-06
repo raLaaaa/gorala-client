@@ -38,7 +38,7 @@ class _TaskCardState extends State<TaskCard> with TickerProviderStateMixin {
     _animation = new Tween<double>(begin: 0, end: 1).animate(new CurvedAnimation(parent: _animationController, curve: Curves.easeInOutCirc));
 
     _fadeAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 750),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 

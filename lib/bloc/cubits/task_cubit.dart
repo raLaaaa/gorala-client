@@ -38,7 +38,6 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   Future<void> getAllTasksOfUserByDateWithRange(DateTime time) async {
-
     emit(TasksLoading());
     Map<DateTime, List<Task>> tasks = await _taskRepository.fetchAllTasksOfUserByDateWithRange(time);
 
@@ -47,6 +46,8 @@ class TaskCubit extends Cubit<TaskState> {
       return;
     }
     _cachedEntries.addAll(tasks);
+
+    print(_cachedEntries);
 
     emit(TasksLoaded(_cachedEntries));
   }
@@ -83,21 +84,24 @@ class TaskCubit extends Cubit<TaskState> {
     emit(TasksLoaded(_cachedEntries));
   }
 
-  Future<void> editTask(Task task) async {
+  Future<void> editTask(Task task, Task oldTask) async {
     emit(TasksLoading());
     Task editedTask = await _taskRepository.editTask(task);
 
+    // ToDo edit in place and with new date
     if (editedTask != null) {
-      var index = -1;
-
-      for (int i = 0; i < _cachedEntries[editedTask.executionDate].length; i++) {
-        index = i;
-        if (_cachedEntries[editedTask.executionDate][i].id == editedTask.id) {
-          break;
+      _cachedEntries.forEach((key, value) {
+        if (key == oldTask.executionDate) {
+          value.forEach((element) {
+            _cachedEntries[key].removeWhere((element) => element.id == oldTask.id);
+          });
         }
-      }
+      });
 
-      _cachedEntries[editedTask.executionDate][index] = editedTask;
+      if (_cachedEntries[editedTask.executionDate] == null) {
+        _cachedEntries[editedTask.executionDate] = [];
+      }
+      _cachedEntries[editedTask.executionDate].add(editedTask);
     } else {
       emit(TasksError('Something broke'));
       return;
@@ -111,6 +115,9 @@ class TaskCubit extends Cubit<TaskState> {
 
     if (editedTask != null) {
       var index = -1;
+
+      // DateTime localExecutionDate = DateTime.parse(entry['ExecutionDate']).toLocal();
+      // DateTime localExectuionDateNoTime = new DateTime(localExecutionDate.year, localExecutionDate.month, localExecutionDate.day, 0,0,0,0).toLocal();
 
       for (int i = 0; i < _cachedEntries[editedTask.executionDate].length; i++) {
         index = i;

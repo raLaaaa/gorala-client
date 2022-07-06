@@ -8,6 +8,7 @@ import 'package:gorala/constants.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/screens/main/main_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class CreateTaskArguments {
   final DateTime initialDate;
@@ -50,8 +51,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting();
     _initialDate = widget.args.initialDate;
-
   }
 
   Widget _CreateTaskForm(BuildContext context) {
@@ -220,9 +221,10 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   void submitCreateTask(BuildContext context) {
     if (_formKey.currentState.validate()) {
-      DateTime date = _selectedDate ?? _initialDate;
 
-      Task toCreate = Task("", _taskDescription, false, _isCarryOn, date, DateTime.now());
+      DateTime executionDate = _selectedDate ?? _initialDate;
+
+      Task toCreate = Task("", _taskDescription, false, _isCarryOn, executionDate, DateTime.now());
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
       taskCubit.createTask(toCreate);

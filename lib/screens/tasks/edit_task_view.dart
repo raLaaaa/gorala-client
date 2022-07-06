@@ -258,7 +258,7 @@ class _EditTaskViewState extends State<EditTaskView> {
       Task editedTask = Task(_taskToEdit.id, _taskDescription, _taskToEdit.isFinished, _isCarryOnTask, date, _taskToEdit.createdAt);
 
       final taskCubit = BlocProvider.of<TaskCubit>(context);
-      taskCubit.editTask(editedTask);
+      taskCubit.editTask(editedTask, _taskToEdit);
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/',

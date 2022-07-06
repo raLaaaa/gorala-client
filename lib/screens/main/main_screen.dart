@@ -54,8 +54,8 @@ class _MainScreenState extends State<MainScreen> {
     _pageController = PageController(initialPage: _initialPage);
     _dateFormat = DateFormat('dd.MM.yyyy');
 
-    DateTime nowFull = DateTime.now().toUtc();
-    DateTime now = DateTime.utc(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
+    DateTime nowFull = DateTime.now();
+    DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
     _currentSelectedDate = now;
     _hasBeenNavigatedByArgs = false;
 
@@ -161,7 +161,7 @@ class _MainScreenState extends State<MainScreen> {
                   } else if (state is TasksLoaded) {
                     DateTime dateToFetch = DateTime.now();
                     dateToFetch = dateToFetch.add(Duration(days: _index - _initialPage));
-                    DateTime roundedDate = DateTime.utc(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
+                    DateTime roundedDate = DateTime(dateToFetch.year, dateToFetch.month, dateToFetch.day, 0, 0, 0, 0);
 
                     var allTasksForThisDay = state.tasks[roundedDate];
                     var openTasksForThisDay = <Task>[];
@@ -283,7 +283,7 @@ class _MainScreenState extends State<MainScreen> {
   void _checkIfAutoNavigate(context) {
     var args = widget.args;
     if (args != null && args.initalDate != null && !_hasBeenNavigatedByArgs) {
-      DateTime nowFull = DateTime.now().toUtc();
+      DateTime nowFull = DateTime.now();
       DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
       DateTime clearedTime = DateTime(args.initalDate.year, args.initalDate.month, args.initalDate.day);
 
@@ -414,7 +414,7 @@ class _MainScreenState extends State<MainScreen> {
       setState(() {
         _currentSelectedDate = picked;
 
-        DateTime nowFull = DateTime.now().toUtc();
+        DateTime nowFull = DateTime.now();
         DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
         DateTime clearedTime = DateTime(_currentSelectedDate.year, _currentSelectedDate.month, _currentSelectedDate.day);
 
