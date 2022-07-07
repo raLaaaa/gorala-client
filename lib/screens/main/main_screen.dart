@@ -96,11 +96,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       appBar: AppBar(
         title: InkWell(
-          onTap: () {
-            setState(() {
-              _selectDate(context);
-            });
-          },
+          onTap: onHeaderDateTap,
           child: Row(
             children: [
               Expanded(child: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28))),
@@ -111,14 +107,7 @@ class _MainScreenState extends State<MainScreen> {
           IconButton(
             tooltip: 'Calender view',
             icon: Icon(Icons.calendar_today),
-            onPressed: () {
-              _pageController.jumpToPage(_initialPage);
-              _refreshTasks(context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Jumped to todays date"),
-                duration: Duration(seconds: 4),
-              ));
-            },
+            onPressed: _onCalendarTap
           ),
           kIsWeb
               ? SizedBox(
@@ -442,5 +431,20 @@ class _MainScreenState extends State<MainScreen> {
     _stepsWentLeft = 0;
     _stepsWentRight = 0;
     _loadedRanges.clear();
+  }
+
+  void _onCalendarTap() {
+    setState(() {
+      _selectDate(context);
+    });
+  }
+
+  void onHeaderDateTap() {
+    _pageController.jumpToPage(_initialPage);
+    _refreshTasks(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Jumped to todays date"),
+      duration: Duration(seconds: 4),
+    ));
   }
 }

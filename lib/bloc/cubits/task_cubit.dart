@@ -46,9 +46,6 @@ class TaskCubit extends Cubit<TaskState> {
       return;
     }
     _cachedEntries.addAll(tasks);
-
-    print(_cachedEntries);
-
     emit(TasksLoaded(_cachedEntries));
   }
 
@@ -88,23 +85,27 @@ class TaskCubit extends Cubit<TaskState> {
     emit(TasksLoading());
     Task editedTask = await _taskRepository.editTask(task);
 
-    // ToDo edit in place and with new date
-    if (editedTask != null) {
-      _cachedEntries.forEach((key, value) {
-        if (key == oldTask.executionDate) {
-          value.forEach((element) {
-            _cachedEntries[key].removeWhere((element) => element.id == oldTask.id);
-          });
+    if (editedTask == null) {
+      emit(TasksError('Something broke'));
+      return;
+    }
+
+    if (task.executionDate == oldTask.executionDate) {
+      List<Task> taskListOfDay = _cachedEntries[task.executionDate];
+      for (var i = 0; i < taskListOfDay.length; i++) {
+        if (taskListOfDay[i] == task.id) {
+          taskListOfDay[i] = editedTask;
+          break;
         }
-      });
+      }
+    } else {
+      List<Task> taskListOfOldDay = _cachedEntries[oldTask.executionDate];
+      taskListOfOldDay.removeWhere((task) => task.id == editedTask.id);
 
       if (_cachedEntries[editedTask.executionDate] == null) {
         _cachedEntries[editedTask.executionDate] = [];
       }
       _cachedEntries[editedTask.executionDate].add(editedTask);
-    } else {
-      emit(TasksError('Something broke'));
-      return;
     }
 
     emit(TasksLoaded(_cachedEntries));
