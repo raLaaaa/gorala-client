@@ -117,7 +117,7 @@ class _MainScreenState extends State<MainScreen> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'Logout'}.map((String choice) {
+              return {'Logout', 'About'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -189,6 +189,9 @@ class _MainScreenState extends State<MainScreen> {
 
   void handleClick(String value) {
     switch (value) {
+      case 'About':
+         print('About');
+        break;
       case 'Logout':
         _logout(context);
         break;
@@ -376,7 +379,7 @@ class _MainScreenState extends State<MainScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'No tasks found',
+            'No tasks found today',
             style: TextStyle(fontSize: 17),
           ),
         ],
