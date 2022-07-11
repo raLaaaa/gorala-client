@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gorala/bloc/cubits/auth_cubit.dart';
 import 'package:gorala/bloc/cubits/task_cubit.dart';
 import 'package:gorala/bloc/repositories/task_repository.dart';
+import 'package:gorala/components/draw_triangle.dart';
 import 'package:gorala/models/task.dart';
 import 'package:gorala/responsive.dart';
 import 'package:gorala/screens/tasks/create_task_view.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants.dart';
 import 'components/list_of_tasks.dart';
@@ -117,7 +120,7 @@ class _MainScreenState extends State<MainScreen> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'Logout', 'About'}.map((String choice) {
+              return {'About', 'Logout'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -190,7 +193,7 @@ class _MainScreenState extends State<MainScreen> {
   void handleClick(String value) {
     switch (value) {
       case 'About':
-         print('About');
+        _showAboutDialogue();
         break;
       case 'Logout':
         _logout(context);
@@ -270,6 +273,29 @@ class _MainScreenState extends State<MainScreen> {
         _loadedRanges.add(newIndex);
       }
     });
+  }
+
+  void _showAboutDialogue() {
+    showAboutDialog(
+        context: context,
+        applicationName: 'gorala',
+        applicationIcon: Triangle(width: 54, height: 54),
+        applicationVersion: '1.0.0',
+        children: [
+          Link(
+            uri: Uri.parse(
+                'https://about.gorala.icu/'),
+            target: LinkTarget.blank,
+            builder: (BuildContext ctx, FollowLink openLink) {
+              return TextButton.icon(
+                onPressed: openLink,
+                label: const Text('https://about.gorala.icu/'),
+                icon: const Icon(Icons.read_more),
+              );
+            },
+          ),
+        ]
+    );
   }
 
   void _checkIfAutoNavigate(context) {
