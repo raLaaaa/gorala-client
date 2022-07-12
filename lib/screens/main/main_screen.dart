@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   bool _hasBeenNavigatedByArgs;
   bool _usePostFrameCallBackByArgNav = false;
   PageController _pageController;
-  DateFormat _dateFormat;
+  DateFormat _dateFormatHeadline;
   DateTime _currentSelectedDate;
 
   @override
@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
 
     _loadedRanges = Set();
     _pageController = PageController(initialPage: _initialPage);
-    _dateFormat = DateFormat('dd.MM.yyyy');
+    _dateFormatHeadline = DateFormat('E, dd.MM.yyyy');
 
     DateTime nowFull = DateTime.now();
     DateTime now = DateTime(nowFull.year, nowFull.month, nowFull.day, 0, 0, 0, 0);
@@ -102,7 +102,7 @@ class _MainScreenState extends State<MainScreen> {
           onTap: onHeaderDateTap,
           child: Row(
             children: [
-              Expanded(child: Text(_dateFormat.format(_currentSelectedDate), style: TextStyle(fontSize: 28))),
+              Expanded(child: Text(_dateFormatHeadline.format(_currentSelectedDate), style: TextStyle(fontSize: 28))),
             ],
           ),
         ),
