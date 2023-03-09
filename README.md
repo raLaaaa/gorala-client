@@ -11,6 +11,8 @@ You can take a look at the screenshots below to get a better understanding:
 ![app gorala icu_(iPhone SE)](https://user-images.githubusercontent.com/12799722/223952926-51bfbfa7-3506-4b55-baa1-1e50e5673ed7.png)
 ![app gorala icu_(iPhone SE) (2)](https://user-images.githubusercontent.com/12799722/223953047-57eea7b4-07ae-455c-a1c2-cf384831a4f3.png)
 ![app gorala icu_(iPhone SE) (1)](https://user-images.githubusercontent.com/12799722/223953062-7b356c60-3594-473f-b3b5-940760d7b326.png)
+![app gorala icu_(iPhone SE) (4)](https://user-images.githubusercontent.com/12799722/223989508-dc4bba12-e74e-44d3-8919-b8d7c01f9d6b.png)
+
 
 The frontend covers basic CRUD operations for tasks.
 Tasks can be marked as done as well as carry on tasks which means they will pop on each day of the calendar until you have finished them.
