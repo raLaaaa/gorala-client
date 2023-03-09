@@ -1,6 +1,6 @@
 ## gorala-app
 
-This is the corrosponding frontend for a task / calendar app.
+This is the corrosponding frontend for a task / calendar app with minimal dependencies.
 It is purely written in [Dart + Flutter](https://flutter.dev/) and is also supported as web version.
 [BloC](https://bloclibrary.dev/#/) is used as state management library.
 
