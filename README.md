@@ -25,6 +25,13 @@ The project is not finished. It is supposed to serve as an starting point for Fl
 If you want to get the web version going of this app you can use the `Dockerfile` which will start the Flutter app web version.
 Otherwise just clone or download the repository and do it the usual Flutter way.
 
+Make sure that the `.env` file contains the URL of the backend. If you run everything locally you could for instance use:
+
+```
+SERVER=http://10.0.2.2:8080
+SERVER_LOCAL=http://10.0.2.2:8080
+``` 
+
 ## Licenses
 
 This library and its content is released under the [MIT License](https://choosealicense.com/licenses/mit/).
