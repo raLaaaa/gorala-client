@@ -9,9 +9,10 @@ Originally this project was supposed as a test for Flutters web support.
 The app is an infinity calendar scrollwer and allows you to create notes / tasks and add a timestamp to them.
 You can take a look at the screenshots below to get a better understanding:
 
-![app gorala icu_(iPhone SE)](https://user-images.githubusercontent.com/12799722/223949908-205c2948-675e-4e2f-8a3a-8755833ca2fb.png)
-![app gorala icu_(iPhone SE) (2)](https://user-images.githubusercontent.com/12799722/223950072-69c3da6e-4452-46c2-81e2-f79d31ec3ac8.png)
-![app gorala icu_(iPhone SE) (1)](https://user-images.githubusercontent.com/12799722/223950077-dd158b94-bcbb-40fb-9964-e2777aeab6b3.png)
+![app gorala icu_(iPhone SE) (3)](https://user-images.githubusercontent.com/12799722/223953006-8bc13419-0ec7-465f-8671-64dcb65247d8.png)
+![app gorala icu_(iPhone SE)](https://user-images.githubusercontent.com/12799722/223952926-51bfbfa7-3506-4b55-baa1-1e50e5673ed7.png)
+![app gorala icu_(iPhone SE) (2)](https://user-images.githubusercontent.com/12799722/223953047-57eea7b4-07ae-455c-a1c2-cf384831a4f3.png)
+![app gorala icu_(iPhone SE) (1)](https://user-images.githubusercontent.com/12799722/223953062-7b356c60-3594-473f-b3b5-940760d7b326.png)
 
 The frontend covers basic CRUD operations for tasks.
 Tasks can be marked as done as well as carry on tasks which means they will pop on each day of the calendar until you have finished them.
