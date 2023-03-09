@@ -20,9 +20,6 @@ Tasks can be marked as done as well as carry on tasks which means they will pop 
 The backend is written in Go and uses [Echo](https://echo.labstack.com/) + [GORM](https://gorm.io/). The flutter app uses the API of this project.
 Authentication is done with `JWT`. You can find the backend [here](https://github.com/raLaaaa/gorala-backend).
 
-This is a pure work in progress side time project and has only educational purpose. 
-The project is not finished. It is supposed to serve as an starting point for Flutter development and show how Flutter works for web and mobile with one code base.
-
 If you want to get the web version going of this app you can use the `Dockerfile` which will start the Flutter app web version.
 Otherwise just clone or download the repository and do it the usual Flutter way.
 
@@ -32,6 +29,11 @@ Make sure that the `.env` file contains the URL of the backend. If you run every
 SERVER=http://10.0.2.2:8080
 SERVER_LOCAL=http://10.0.2.2:8080
 ``` 
+
+This is a pure work in progress side time project and has only educational purpose. 
+The project is not finished. 
+It is supposed to serve as an starting point for Flutter development and show how Flutter works for web and mobile with one code base and also can provide an example on how to structure a simple Flutter app with statemanagement.
+
 
 ## Licenses
 
