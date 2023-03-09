@@ -31,6 +31,7 @@ SERVER_LOCAL=http://10.0.2.2:8080
 
 This is a pure work in progress side time project and has only educational purpose. 
 The project is not finished and is probably buggy somewhere. 
+
 It is supposed to serve as an starting point for Flutter development and show how Flutter works for web and mobile with one code base and also can provide an example on how to structure a simple Flutter app with statemanagement.
 
 
