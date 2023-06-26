@@ -36,7 +36,6 @@ The project is not finished and is probably buggy somewhere.
 
 It is supposed to serve as an starting point for Flutter development and show how Flutter works for web and mobile with one code base and also can provide an example on how to structure a simple Flutter app with statemanagement.
 
-
 ## Licenses
 
 This library and its content is released under the [MIT License](https://choosealicense.com/licenses/mit/).
